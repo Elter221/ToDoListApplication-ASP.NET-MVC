@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebPage</title>
+        <link href="~/styles/app.css" rel="stylesheet" />
+    </head>
+    <body>
+        <menu>
+            <a asp-controller="Home" asp-action="Index">ToDo</a>
+        </menu>
+        <div class="body">
+            <div>
+                @(await RenderSectionAsync("TableHeader", true))
+            </div>
+            @RenderBody()
+        </div>
+        <footer>
+            Made by Dudik Vladislav!
+        </footer>
+    </body>
+</html>

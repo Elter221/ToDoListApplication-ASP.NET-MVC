@@ -1,0 +1,36 @@
+html {
+    height: 95vh;
+}
+
+body {
+    margin: 20px 50px;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    flex-basis: 100%;
+}
+
+menu {
+    text-transform: uppercase;
+    padding: 0;
+    display: flex;
+}
+
+footer {
+    padding: 10px 0;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+/*Table*/
+
+th {
+    min-width: 150px;
+    text-align: center;
+}
+
+table, th {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
