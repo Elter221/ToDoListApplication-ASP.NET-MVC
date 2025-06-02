@@ -1,0 +1,11 @@
+@model ToDoModel
+
+@{
+    ViewData["Title"] = "ToDo Details";
+}
+
+@section PageHeader{
+    <h2>@Model.Name</h2>
+}
+
+@Html.DisplayForModel();

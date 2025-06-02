@@ -1,5 +1,6 @@
 html {
     height: 95vh;
+    background-color: white;
 }
 
 body {
@@ -14,6 +15,7 @@ menu {
     text-transform: uppercase;
     padding: 0;
     display: flex;
+    gap: 20px;
 }
 
 footer {
@@ -23,6 +25,13 @@ footer {
     width: 100%;
 }
 
+/*Link*/
+a.create {
+    margin: 10px 0;
+    display: flex;
+}
+
+
 /*Table*/
 
 th {
@@ -30,7 +39,28 @@ th {
     text-align: center;
 }
 
-table, th {
+table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
+    background: #ffffff;
+}
+
+.overdue-task td {
+    background: rgba(141, 2, 31, 0.5);
+    position: relative;
+}
+
+/*Form*/
+.form-row {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.form-row label {
+    flex-basis: 150px;
+}
+
+.text-danger {
+    color: red;
 }

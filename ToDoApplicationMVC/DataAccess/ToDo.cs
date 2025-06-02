@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ToDoApplicationMVC.DataAccess;
 
@@ -21,6 +22,17 @@ public class ToDo
 
     [Required]
     public Status Status { get; set; }
+
+    [ForeignKey("ToDoList")]
+    public int ToDoListId { get; set; }
+
+    [ForeignKey("User")]
+    public int UserId { get; set; }
+
+    public ToDoList ToDoList { get; set; }
+
+    public User User { get; set; }
+
 }
 
 public enum Status { InProgress, Completed, Failed }

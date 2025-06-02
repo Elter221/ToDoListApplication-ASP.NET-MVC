@@ -1,0 +1,29 @@
+@model IEnumerable<ToDoModel>
+
+@{
+    var listid = ViewData["ListId"] as int?;
+}
+
+@section PageHeader {
+    <h2>To-Do List</h2>
+}
+
+<a class="create" asp-controller="ToDo" asp-action="Create" asp-route-id="@listid">Create new ToDo</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Creation Date</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @(await Html.PartialAsync("_ToDoRow", item))
+        }
+    </tbody>
+</table>

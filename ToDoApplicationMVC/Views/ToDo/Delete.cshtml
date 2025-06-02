@@ -1,0 +1,16 @@
+@model ToDoModel
+
+@section PageHeader {
+    <h2>Confirm removal of @Model.Name</h2>
+}
+
+<form asp-controller="ToDo" asp-action="ConfirmDelete" method="post">
+    <input type="hidden" asp-for="@Model.Id" />
+    <input type="hidden" name="listid" asp-for="@Model.ToDoListId" />
+
+    @Html.DisplayForModel(Model)
+
+    <div class="form-row">
+        <input type="submit" value="Confirm" />
+    </div>
+</form>

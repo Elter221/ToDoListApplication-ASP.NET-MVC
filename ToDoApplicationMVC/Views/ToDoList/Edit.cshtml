@@ -1,0 +1,30 @@
+@model ToDoListModel
+
+@section PageHeader {
+    <h2>Edit ToDo List: @Model.Name</h2>
+}
+
+<form asp-controller="ToDoList" asp-action="Edit" method="post">
+    <div asp-validation-summary="All"></div>
+
+    <input type="hidden" asp-for="Id" />
+    <div class="form-row">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" . />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-row">
+        <label asp-for="CreatedAt" class="control-label"></label>
+        <input asp-for="CreatedAt" class="form-control" type="date" . />
+        <span asp-validation-for="CreatedAt" class="text-danger"></span>
+    </div>
+
+    <div class="form-row">
+        <input type="submit" value="Edit" . />
+    </div>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

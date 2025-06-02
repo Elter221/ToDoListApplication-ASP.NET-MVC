@@ -1,23 +1,23 @@
-@model IEnumerable<ToDoModel>
+@model IEnumerable<ToDoListModel>
 
-@section TableHeader {
+@section PageHeader {
     <h2>Your ToDo's List</h2>
 }
 
+<a class="create" asp-controller="ToDoList" asp-action="Create">Create new List</a>
 <table class="table">
     <thead>
         <tr>
             <th>Name</th>
-            <th>Description</th>
             <th>Creation Date</th>
-            <th>Deadline</th>
-            <th>Status</th>
+            <th>Tasks count</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            @(await Html.PartialAsync("_ToDoRow", item))
+            @(await Html.PartialAsync("_ToDoListRow", item))
         }
     </tbody>
 </table>

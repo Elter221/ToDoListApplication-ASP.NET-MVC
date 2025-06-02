@@ -1,0 +1,12 @@
+@model ToDoListModel
+
+<tr>
+    <td>@Model.Name</td>
+    <td>@Model.CreatedAt.ToString("dd.MM.yyyy")</td>
+    <td>@Model.NumberOfTasks</td>
+    <td>
+        <a asp-controller="ToDoList" asp-action="View" asp-route-id="@Model.Id">View</a>
+        <a asp-controller="ToDoList" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+        <a asp-controller="ToDoList" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+    </td>
+</tr>

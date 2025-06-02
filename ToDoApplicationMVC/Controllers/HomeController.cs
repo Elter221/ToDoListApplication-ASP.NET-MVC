@@ -9,17 +9,16 @@ public class HomeController(TodoListDbContext context)
 {
     public async Task<IActionResult> Index()
     {
-        var data = await context.ToDos.ToListAsync();
+        var data = await context.ToDoLists.Include(x => x.ToDos).ToListAsync();
 
-        var toDosModel = data.Select(x => new ToDoModel()
+        var toDosModel = data.Select(x => new ToDoListModel()
         {
+            Id = x.Id,
             Name = x.Name,
-            Description = x.Description,
             CreatedAt = x.CreationDate,
-            Deadline = x.Deadline,
-            Status = x.Status.ToString(),
+            NumberOfTasks = x.ToDos.Count,
         }).ToArray();
 
-        return View(toDosModel);
+        return this.View(toDosModel);
     }
 }

@@ -1,0 +1,20 @@
+@model ToDoModel
+
+@{
+    bool isOverdue = @Model.Deadline < DateOnly.FromDateTime(DateTime.Now)
+        && (@Model.Status != ("Completed")
+        || @Model.Status == ("Failed"));
+}
+
+<tr class="@(isOverdue ? "overdue-task" : "")">
+    <td>@Model.Name</td>
+    <td>@Model.Description</td>
+    <td>@Model.CreatedAt.ToString("dd.MM.yyyy")</td>
+    <td>@Model.Deadline.ToString("dd.MM.yyyy")</td>
+    <td>@Model.Status</td>
+    <td>
+        <a asp-controller="ToDo" asp-action="View" asp-route-id="@Model.Id">View</a>
+        <a asp-controller="ToDo" asp-action="Delete" asp-route-id="@Model.Id" asp-route-listid="@Model.ToDoListId">Delete</a>
+        <a asp-controller="ToDo" asp-action="Edit" asp-route-id="@Model.Id" asp-route-listid="@Model.ToDoListId">Edit</a>
+    </td>
+</tr>

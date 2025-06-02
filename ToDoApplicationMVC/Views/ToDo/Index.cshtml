@@ -1,0 +1,57 @@
+@model IEnumerable<ToDoModel>
+
+@{
+    var userId = 1 as int?;
+}
+
+@section PageHeader {
+    <h2>Your To-Do List</h2>
+}
+
+<form asp-action="Index" asp-controller="ToDo" asp-route-userId="@userId" method="post">
+    <div class="form-row">
+        <input type="text" name="search", value="@ViewBag.Search"/>
+        @Html.DropDownList("searchType", new SelectList(new List<SelectListItem>{
+            new SelectListItem { Text = "Name", Value = "name"},
+            new SelectListItem { Text = "Status", Value = "status"},
+            new SelectListItem { Text = "Deadline Date", Value = "deadline"}
+        }, "Value", "Text"), "Select Search Type")
+        <input type="submit" value="Search" />
+    </div>
+</form>
+
+<form asp-action="Sort" asp-controller="ToDo" asp-route-userId="@userId" method="post">
+    <div class="form-row">
+        @Html.DropDownList("sortBy", new SelectList(new List<SelectListItem>{
+        new SelectListItem { Text = "Name", Value = "name"},
+        new SelectListItem { Text = "Status", Value = "status"},
+        new SelectListItem { Text = "Deadline Date", Value = "deadline"}
+        }, "Value", "Text"), "Select Sort Type(Default - Creation Date)")
+
+        @Html.DropDownList("sortOrder", new SelectList(new List<SelectListItem>{
+        new SelectListItem { Text = "Ascending", Value = "asc"},
+        new SelectListItem { Text = "Descending", Value = "desc"},
+        }, "Value", "Text"), "Select Sort Order")
+
+        <input type="submit" value="Sort" />
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Creation Date</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) 
+        {
+            @(await Html.PartialAsync("_ToDoRow", item))
+        }
+    </tbody>
+</table>
