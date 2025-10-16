@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.DataAccess;
@@ -86,24 +85,27 @@ public class ToDoController(TodoListDbContext context) : Controller
 
     public async Task<IActionResult> View([FromRoute] int id)
     {
-        var data = await context.ToDos.FirstOrDefaultAsync(x => x.Id == id);
+        var data = await context.ToDos
+            .FirstOrDefaultAsync(x => x.Id == id);
 
         if (data == null)
         {
             return this.NotFound();
         }
 
-        StringBuilder tagsStr = new();
-        if (data.Tags != null)
-        {
-            foreach (var tag in data.Tags)
-            {
-                _ = tagsStr.Append(tag.TagName + ", ");
-            }
-        }
-
-        _ = tagsStr.Remove(tagsStr.Length - 2, 2);
-
+        var tags = await context.TagToDos
+                .Where(x => x.ToDoId == data.Id)
+                .Join(context.Tags,
+                    tagToDo => tagToDo.TagsId,
+                    tag => tag.Id,
+                    (tagToDo, tag) => tag)
+                .Select(x => new TagModel()
+                {
+                    Id = x.Id,
+                    Name = x.TagName
+                })
+                .ToListAsync();
+        // в маппинг вынести
         var toDosModel = new ToDoModel()
         {
             Name = data.Name,
@@ -112,8 +114,7 @@ public class ToDoController(TodoListDbContext context) : Controller
             Deadline = data.Deadline,
             Status = data.Status.ToString(),
             ToDoListId = data.ToDoListId,
-            Tags = data.Tags,
-            TagsInput = tagsStr.ToString()
+            Tags = tags
         };
 
         return this.View(toDosModel);
@@ -152,7 +153,6 @@ public class ToDoController(TodoListDbContext context) : Controller
             },
             ToDoListId = id,
             UserId = (await context.Users.FirstAsync()).Id,
-            Tags = model.Tags,
         };
 
         _ = context.ToDos.Add(toDo);
@@ -252,8 +252,21 @@ public class ToDoController(TodoListDbContext context) : Controller
             "Completed" => Status.Completed,
             _ => Status.Failed,
         };
+        if (model.TagsInput != string.Empty)
+        {
+            var tagId = await this.FindOrAddTagInDB(model.TagsInput);
+            if (!context.TagToDos.Any(x => x.TagsId == tagId && x.ToDoId == toDoToFind.Id))
+            {
+                await context.TagToDos!.AddAsync(
+                new TagToDo
+                {
+                    TagsId = tagId,
+                    ToDoId = toDoToFind.Id
+                });
+            }
+        }
 
-        _ = await context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         int id = listid;
 
@@ -273,5 +286,20 @@ public class ToDoController(TodoListDbContext context) : Controller
 
     private async Task<bool> ToDoNameExists(string name, int id) =>
        await context.ToDos.AnyAsync(c => c.Name == name && c.ToDoListId == id);
+
+    private async Task<int> FindOrAddTagInDB(string name)
+    {
+        var tag = await context.Tags
+                .Select(x => x)
+                .FirstOrDefaultAsync(t => t.TagName == name);
+        if (tag == null)
+        {
+            tag = new Tag { TagName = name };
+            _ = await context.Tags.AddAsync(tag);
+            _ = await context.SaveChangesAsync();
+        }
+
+        return tag.Id;
+    }
 
 }

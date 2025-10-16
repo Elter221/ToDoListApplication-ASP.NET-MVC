@@ -14,10 +14,16 @@
     <td>@Model.Status</td>
 </tr>
 
-@if(Model.Tags != null)
+@if (Model.Tags != null && Model.Tags.Any())
 {
-    foreach (var item in Model.Tags)
-    {
-        @(await Html.PartialAsync("_TagButton", item))
-    }
+    <tr>
+        <td colspan="5" class="tags-cell">
+            <div class="tags-container">
+                @foreach (var tag in Model.Tags)
+                {
+                    @(await Html.PartialAsync("_TagButton", tag))
+                }
+            </div>
+        </td>
+    </tr>
 }

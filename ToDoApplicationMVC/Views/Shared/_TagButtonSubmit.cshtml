@@ -1,0 +1,8 @@
+@model TagModel
+
+@{
+    <a asp-action="OnTagClick" asp-route-tagName="@Model.Name" asp-route-tagId="@Model.Id"
+       class="tag-button">
+        @Model.Name
+    </a>
+}

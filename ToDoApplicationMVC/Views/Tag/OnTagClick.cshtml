@@ -1,14 +1,9 @@
 @model IEnumerable<ToDoModel>
 
-@{
-    var listid = ViewData["ListId"] as int?;
-}
-
 @section PageHeader {
-    <h2>To-Do List</h2>
+    <h2>List of To-Dos for Tag @ViewBag.Tag</h2>
 }
 
-<a class="create" asp-controller="ToDo" asp-action="Create" asp-route-id="@listid">Create new ToDo</a>
 <table class="table">
     <thead>
         <tr>
@@ -27,3 +22,4 @@
         }
     </tbody>
 </table>
+
