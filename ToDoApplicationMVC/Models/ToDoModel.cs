@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApplicationMVC.CustomAttributes;
+using ToDoApplicationMVC.DataAccess;
 
 namespace ToDoApplicationMVC.Models;
 
@@ -31,4 +33,9 @@ public class ToDoModel
     public int ToDoListId { get; set; }
 
     public int UserId { get; set; }
+
+    public ICollection<Tag>? Tags { get; set; }
+
+    [HiddenInput]
+    public StringBuilder TagsInput { get; set; } = new StringBuilder();
 }

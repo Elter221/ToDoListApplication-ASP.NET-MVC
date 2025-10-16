@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoApplicationMVC.DataAccess;
 
@@ -11,9 +12,11 @@ using ToDoApplicationMVC.DataAccess;
 namespace ToDoApplicationMVC.Migrations
 {
     [DbContext(typeof(TodoListDbContext))]
-    partial class TodoListDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016074243_AddTagClass")]
+    partial class AddTagClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace ToDoApplicationMVC.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("TagToDo", b =>
-                {
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToDoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TagsId", "ToDoId");
-
-                    b.HasIndex("ToDoId");
-
-                    b.ToTable("TagToDo");
-                });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.Tag", b =>
                 {
@@ -79,6 +67,9 @@ namespace ToDoApplicationMVC.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TagId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ToDoListId")
                         .HasColumnType("int");
 
@@ -86,6 +77,8 @@ namespace ToDoApplicationMVC.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TagId");
 
                     b.HasIndex("ToDoListId");
 
@@ -142,23 +135,12 @@ namespace ToDoApplicationMVC.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TagToDo", b =>
-                {
-                    b.HasOne("ToDoApplicationMVC.DataAccess.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ToDoApplicationMVC.DataAccess.ToDo", null)
-                        .WithMany()
-                        .HasForeignKey("ToDoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDo", b =>
                 {
+                    b.HasOne("ToDoApplicationMVC.DataAccess.Tag", null)
+                        .WithMany("ToDo")
+                        .HasForeignKey("TagId");
+
                     b.HasOne("ToDoApplicationMVC.DataAccess.ToDoList", "ToDoList")
                         .WithMany("ToDos")
                         .HasForeignKey("ToDoListId")
@@ -174,6 +156,11 @@ namespace ToDoApplicationMVC.Migrations
                     b.Navigation("ToDoList");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ToDoApplicationMVC.DataAccess.Tag", b =>
+                {
+                    b.Navigation("ToDo");
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDoList", b =>

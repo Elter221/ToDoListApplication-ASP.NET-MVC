@@ -31,6 +31,8 @@ public class ToDo
 
     public ToDoList ToDoList { get; set; }
 
+    public ICollection<Tag>? Tags { get; set; }
+
     public User User { get; set; }
 
 }

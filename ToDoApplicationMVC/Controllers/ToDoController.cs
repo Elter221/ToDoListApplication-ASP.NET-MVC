@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.DataAccess;
@@ -92,6 +93,17 @@ public class ToDoController(TodoListDbContext context) : Controller
             return this.NotFound();
         }
 
+        StringBuilder tagsStr = new();
+        if (data.Tags != null)
+        {
+            foreach (var tag in data.Tags)
+            {
+                _ = tagsStr.Append(tag.TagName + ", ");
+            }
+        }
+
+        _ = tagsStr.Remove(tagsStr.Length - 2, 2);
+
         var toDosModel = new ToDoModel()
         {
             Name = data.Name,
@@ -100,6 +112,8 @@ public class ToDoController(TodoListDbContext context) : Controller
             Deadline = data.Deadline,
             Status = data.Status.ToString(),
             ToDoListId = data.ToDoListId,
+            Tags = data.Tags,
+            TagsInput = tagsStr.ToString()
         };
 
         return this.View(toDosModel);
@@ -138,6 +152,7 @@ public class ToDoController(TodoListDbContext context) : Controller
             },
             ToDoListId = id,
             UserId = (await context.Users.FirstAsync()).Id,
+            Tags = model.Tags,
         };
 
         _ = context.ToDos.Add(toDo);

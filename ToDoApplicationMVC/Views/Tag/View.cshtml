@@ -1,0 +1,10 @@
+@model IEnumerable<TagModel>
+
+@section PageHeader {
+    <h2>Existing Tags</h2>
+}
+
+@foreach (var item in Model)
+{
+    @(await Html.PartialAsync("_TagButton", item))
+}

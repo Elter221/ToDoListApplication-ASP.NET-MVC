@@ -12,12 +12,10 @@
     <td>@Model.CreatedAt.ToString("dd.MM.yyyy")</td>
     <td>@Model.Deadline.ToString("dd.MM.yyyy")</td>
     <td>@Model.Status</td>
+    <td>@Model.TagsInput</td>
+    <td>
+        <a asp-controller="ToDo" asp-action="View" asp-route-id="@Model.Id">View</a>
+        <a asp-controller="ToDo" asp-action="Delete" asp-route-id="@Model.Id" asp-route-listid="@Model.ToDoListId">Delete</a>
+        <a asp-controller="ToDo" asp-action="Edit" asp-route-id="@Model.Id" asp-route-listid="@Model.ToDoListId">Edit</a>
+    </td>
 </tr>
-
-@if(Model.Tags != null)
-{
-    foreach (var item in Model.Tags)
-    {
-        @(await Html.PartialAsync("_TagButton", item))
-    }
-}

@@ -1,3 +1,17 @@
 @model ToDoModel
 
-@Model.Name created at (<strong>@Model.CreatedAt</strong>) with status @Model.Status
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Creation Date</th>
+            <th>Deadline</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @await Html.PartialAsync("_ToDoRow", Model)
+    </tbody>
+</table>

@@ -17,13 +17,14 @@
             <th>Creation Date</th>
             <th>Deadline</th>
             <th>Status</th>
+            <th>Tags</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            @(await Html.PartialAsync("_ToDoRow", item))
+            @(await Html.PartialAsync("_ToDoRowList", item))
         }
     </tbody>
 </table>
