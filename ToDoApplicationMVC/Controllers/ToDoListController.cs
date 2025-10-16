@@ -167,19 +167,4 @@ public class ToDoListController(TodoListDbContext context) : Controller
 
     private async Task<bool> ListNameExists(string name) =>
        await context.ToDoLists.AnyAsync(c => c.Name == name);
-
-    private string CreateTagsStr(ICollection<Tag> tags)
-    {
-        StringBuilder tagsStr = new();
-        if (tags != null)
-        {
-            foreach (var tag in tags)
-            {
-                _ = tagsStr.Append(tag.TagName + ", ");
-            }
-            _ = tagsStr.Remove(tagsStr.Length - 2, 2);
-        }
-
-        return tagsStr.ToString();
-    }
 }

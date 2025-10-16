@@ -1,54 +1,37 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess;
-using ToDoApplicationMVC.Models;
+using ToDoApplicationMVC.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
-public class TagController(TodoListDbContext context) : Controller
+public class TagController(IToDoService service) : Controller
 {
     public async Task<IActionResult> View()
     {
-        var data = await context.Tags
-            .ToListAsync();
-
-        if (data == null)
+        var result = await service.GetTags();
+        if (result == null)
         {
             return this.NotFound();
         }
 
-        var TagModels = data.Select(x => new TagModel
-        {
-            Id = x.Id,
-            Name = x.TagName,
-        });
-
-        return this.View(TagModels);
+        return this.View(result);
     }
 
     public async Task<IActionResult> OnTagClick(int tagId, string tagName)
     {
-        var toDos = await context.TagToDos
-            .Where(x => x.TagsId == tagId)
-            .Join(context.ToDos,
-            tag => tag.ToDoId,
-            toDo => toDo.Id,
-            (tag, toDo) => toDo)
-            .ToListAsync();
-
-        var toDosModel = toDos.Select(x => new ToDoModel()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            CreatedAt = x.CreationDate,
-            Deadline = x.Deadline,
-            Status = x.Status.ToString(),
-            ToDoListId = x.ToDoListId,
-
-        });
+        var toDosModel = await service.GetToDosByTag(tagId);
 
         this.ViewBag.Tag = tagName;
 
-        return this.View(toDosModel);
+        return this.View("~/Views/ToDo/Index.cshtml", toDosModel);
+    }
+
+    [AcceptVerbs("POST")]
+    public async Task<IActionResult> DeleteTag(int tagId, int id)
+    {
+        if (!await service.DeleteTag(tagId, id))
+        {
+            return this.NotFound();
+        }
+
+        return this.RedirectToAction("View", "ToDo", new { id });
     }
 }

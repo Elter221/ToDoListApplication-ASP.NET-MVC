@@ -5,7 +5,14 @@
 }
 
 @section PageHeader {
-    <h2>Your To-Do List</h2>
+    @if(ViewBag.Tag != null)
+    {
+        <h2>List of To-Dos for Tag @ViewBag.Tag</h2>
+    }
+    else
+    {
+        <h2>Your To-Do List</h2>
+    }
 }
 
 <form asp-action="Index" asp-controller="ToDo" asp-route-userId="@userId" method="post">

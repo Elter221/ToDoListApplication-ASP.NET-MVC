@@ -4,6 +4,7 @@
     bool isOverdue = @Model.Deadline < DateOnly.FromDateTime(DateTime.Now)
         && (@Model.Status != ("Completed")
         || @Model.Status == ("Failed"));
+    ViewBag.ToDoId = Model.Id;
 }
 
 <tr class="@(isOverdue ? "overdue-task" : "")">

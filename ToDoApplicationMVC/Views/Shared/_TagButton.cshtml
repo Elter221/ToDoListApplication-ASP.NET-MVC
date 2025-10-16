@@ -1,7 +1,16 @@
 @model TagModel
 
 @{
-    <button type="button" class="tag-button">
-        @Model.Name
-    </button>
+    var id = ViewContext.RouteData.Values["id"]?.ToString();
+}
+
+@{
+    <form asp-controller="Tag" asp-action="DeleteTag" method="post" class="tag-form">
+        <input type="hidden" name="tagId" value="@Model.Id" />
+        <input type="hidden" name="id" value="@id" />
+        <div class="tag-with-delete">
+            <span class="tag-text">@Model.Name</span>
+            <button type="submit" class="delete-tag-btn">×</button>
+        </div>
+    </form>
 }
