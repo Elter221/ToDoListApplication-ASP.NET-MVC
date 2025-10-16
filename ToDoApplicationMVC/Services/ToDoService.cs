@@ -282,16 +282,6 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         => await context.ToDos
         .AnyAsync(c => c.Name == name && c.ToDoListId == listId);
 
-    public async Task<bool> ValidateToDoName(string name, int listId)
-    {
-        if (await this.IsToDoNameExists(name, listId))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
     private async Task<int> FindOrAddTagInDB(string name)
     {
         var tag = await context.Tags

@@ -119,7 +119,7 @@ public class ToDoController(IToDoService service) : Controller
     [AcceptVerbs("GET", "POST")]
     public async Task<ActionResult> Validate(string name, int listid)
     {
-        if (await service.ValidateToDoName(name, listid))
+        if (await service.IsToDoNameExists(name, listid))
         {
             return this.Json("ToDo name already exists");
         }

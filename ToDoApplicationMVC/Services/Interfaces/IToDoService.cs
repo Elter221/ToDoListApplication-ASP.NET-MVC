@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
 using ToDoApplicationMVC.Models;
 
 namespace ToDoApplicationMVC.Services.Interfaces;
@@ -26,6 +25,4 @@ public interface IToDoService
     Task<IEnumerable<ToDoModel>> GetToDosByTag(int tagId);
 
     Task<bool> DeleteTag(int tagId, int toDoId);
-
-    Task<bool> ValidateToDoName(string name, int listId);
 }

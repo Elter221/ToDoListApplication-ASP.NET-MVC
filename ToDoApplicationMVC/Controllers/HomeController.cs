@@ -1,24 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess;
-using ToDoApplicationMVC.Models;
+using ToDoApplicationMVC.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
-public class HomeController(TodoListDbContext context)
+public class HomeController(IToDoListService service)
     : Controller
 {
     public async Task<IActionResult> Index()
-    {
-        var data = await context.ToDoLists.Include(x => x.ToDos).ToListAsync();
-
-        var toDosModel = data.Select(x => new ToDoListModel()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            CreatedAt = x.CreationDate,
-            NumberOfTasks = x.ToDos.Count,
-        }).ToArray();
-
-        return this.View(toDosModel);
-    }
+        => this.View(await service.GetToDoLists());
 }
