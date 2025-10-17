@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoApplicationMVC.DataAccess;
 
@@ -11,9 +12,11 @@ using ToDoApplicationMVC.DataAccess;
 namespace ToDoApplicationMVC.Migrations
 {
     [DbContext(typeof(TodoListDbContext))]
-    partial class TodoListDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251017202023_AddCommentTable")]
+    partial class AddCommentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -179,7 +182,7 @@ namespace ToDoApplicationMVC.Migrations
                         .IsRequired();
 
                     b.HasOne("ToDoApplicationMVC.DataAccess.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -198,7 +201,7 @@ namespace ToDoApplicationMVC.Migrations
                         .IsRequired();
 
                     b.HasOne("ToDoApplicationMVC.DataAccess.User", "User")
-                        .WithMany()
+                        .WithMany("ToDos")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -210,6 +213,13 @@ namespace ToDoApplicationMVC.Migrations
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDoList", b =>
                 {
+                    b.Navigation("ToDos");
+                });
+
+            modelBuilder.Entity("ToDoApplicationMVC.DataAccess.User", b =>
+                {
+                    b.Navigation("Comments");
+
                     b.Navigation("ToDos");
                 });
 #pragma warning restore 612, 618

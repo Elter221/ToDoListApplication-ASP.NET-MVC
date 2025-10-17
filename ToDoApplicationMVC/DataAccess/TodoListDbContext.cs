@@ -13,6 +13,9 @@ public class TodoListDbContext : DbContext
     public DbSet<User> Users { get; set; }
 
     public DbSet<TagToDo> TagToDos { get; set; }
+
+    public DbSet<Comment> Comments { get; set; }
+
     public TodoListDbContext(DbContextOptions<TodoListDbContext> options)
         : base(options)
     {

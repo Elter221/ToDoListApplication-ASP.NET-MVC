@@ -9,6 +9,4 @@ public class Tag
 
     [Required]
     public string TagName { get; set; }
-
-    public ICollection<ToDo> ToDos { get; set; }
 }

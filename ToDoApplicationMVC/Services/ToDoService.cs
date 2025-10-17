@@ -57,7 +57,6 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         context.TagToDos
             .RemoveRange(
                 await context.TagToDos
-                .Select(x => x)
                 .Where(x => x.TagsId == tagId && x.ToDoId == toDoId)
                 .ToArrayAsync());
 

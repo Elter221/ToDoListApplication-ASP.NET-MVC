@@ -34,5 +34,7 @@ public class ToDoModel
 
     public ICollection<TagModel>? Tags { get; set; }
 
+    //public ICollection<CommentModel>? Comments { get; set; }
+
     public string TagsInput { get; set; } = string.Empty;
 }
