@@ -6,5 +6,5 @@ public class TagModel
 
     public string Name { get; set; }
 
-    public ICollection<ToDoModel> ToDos { get; set; }
+    public List<ToDoModel> ToDos { get; set; }
 }

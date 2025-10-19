@@ -12,4 +12,8 @@ public class User
     public string Email { get; set; }
 
     public string Password { get; set; }
+
+    public List<ToDo> ToDos { get; set; }
+
+    public List<Comment> Comments { get; set; }
 }

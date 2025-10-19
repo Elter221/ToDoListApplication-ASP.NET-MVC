@@ -22,34 +22,19 @@ namespace ToDoApplicationMVC.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ToDoApplicationMVC.DataAccess.Comment", b =>
+            modelBuilder.Entity("TagToDo", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("TagsId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LastUpdateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ToDoId")
+                    b.Property<int>("ToDosId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.HasKey("TagsId", "ToDosId");
 
-                    b.HasKey("Id");
+                    b.HasIndex("ToDosId");
 
-                    b.HasIndex("ToDoId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
+                    b.ToTable("TagToDo", (string)null);
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.Tag", b =>
@@ -66,20 +51,7 @@ namespace ToDoApplicationMVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
-                });
-
-            modelBuilder.Entity("ToDoApplicationMVC.DataAccess.TagToDo", b =>
-                {
-                    b.Property<int>("TagsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToDoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TagsId", "ToDoId");
-
-                    b.ToTable("TagToDos");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDo", b =>
@@ -98,7 +70,8 @@ namespace ToDoApplicationMVC.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -119,7 +92,7 @@ namespace ToDoApplicationMVC.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ToDos");
+                    b.ToTable("ToDos", (string)null);
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDoList", b =>
@@ -142,7 +115,7 @@ namespace ToDoApplicationMVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ToDoLists");
+                    b.ToTable("ToDoLists", (string)null);
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.User", b =>
@@ -167,26 +140,22 @@ namespace ToDoApplicationMVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("ToDoApplicationMVC.DataAccess.Comment", b =>
+            modelBuilder.Entity("TagToDo", b =>
                 {
-                    b.HasOne("ToDoApplicationMVC.DataAccess.ToDo", "ToDo")
+                    b.HasOne("ToDoApplicationMVC.DataAccess.Tag", null)
                         .WithMany()
-                        .HasForeignKey("ToDoId")
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ToDoApplicationMVC.DataAccess.User", "User")
+                    b.HasOne("ToDoApplicationMVC.DataAccess.ToDo", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ToDosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ToDo");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDo", b =>
@@ -198,7 +167,7 @@ namespace ToDoApplicationMVC.Migrations
                         .IsRequired();
 
                     b.HasOne("ToDoApplicationMVC.DataAccess.User", "User")
-                        .WithMany()
+                        .WithMany("ToDos")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -209,6 +178,11 @@ namespace ToDoApplicationMVC.Migrations
                 });
 
             modelBuilder.Entity("ToDoApplicationMVC.DataAccess.ToDoList", b =>
+                {
+                    b.Navigation("ToDos");
+                });
+
+            modelBuilder.Entity("ToDoApplicationMVC.DataAccess.User", b =>
                 {
                     b.Navigation("ToDos");
                 });

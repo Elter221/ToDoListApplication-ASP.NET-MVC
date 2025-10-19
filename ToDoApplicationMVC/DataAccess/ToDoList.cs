@@ -4,7 +4,6 @@ namespace ToDoApplicationMVC.DataAccess;
 
 public class ToDoList
 {
-    [Key]
     public int Id { get; set; }
 
     [Required]
@@ -16,5 +15,5 @@ public class ToDoList
     [Required]
     public int NumberOfTasks { get; set; }
 
-    public ICollection<ToDo> ToDos { get; set; }
+    public List<ToDo> ToDos { get; set; }
 }

@@ -25,8 +25,8 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             UserId = (await context.Users.FirstAsync()).Id,
         };
 
-        _ = context.ToDos.Add(toDo);
-        _ = await context.SaveChangesAsync();
+        await context.ToDos.AddAsync(toDo);
+        await context.SaveChangesAsync();
     }
 
     public async Task<bool> Delete(int id)
@@ -38,29 +38,31 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             return false;
         }
 
-        _ = context.ToDos.Remove(country!);
+        context.ToDos.Remove(country!);
 
-        _ = await context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<bool> DeleteTag(int tagId, int toDoId)
     {
-        var tag = await context.Tags.FindAsync(tagId);
+        var tag = await context.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
 
         if (tag is null)
         {
             return false;
         }
 
-        context.TagToDos
-            .RemoveRange(
-                await context.TagToDos
-                .Where(x => x.TagsId == tagId && x.ToDoId == toDoId)
-                .ToArrayAsync());
+        var toDo = context.ToDos.Include(todo => todo.Tags).SingleOrDefault(t => t.Id == toDoId);
+        if (toDo is null)
+        {
+            return false;
+        }
 
-        _ = await context.SaveChangesAsync();
+        toDo.Tags.Remove(tag);
+        await context.SaveChangesAsync();
+
 
         return true;
     }
@@ -72,8 +74,13 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             return false;
         }
 
-        var toDoToFind = await context.ToDos.FirstAsync(x => x.Id == toDo.Id);
-
+        var toDoToFind = await context.ToDos
+            .Include(t => t.Tags)
+            .FirstOrDefaultAsync(x => x.Id == toDo.Id);
+        if (toDoToFind == null)
+        {
+            return false;
+        }
         toDoToFind.Name = toDo.Name;
         toDoToFind.Description = toDo.Description;
         toDoToFind.CreationDate = toDo.CreatedAt;
@@ -86,27 +93,22 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         };
         if (toDo.TagsInput != string.Empty)
         {
-            var tagId = await this.FindOrAddTagInDB(toDo.TagsInput);
-            if (!context.TagToDos.Any(x => x.TagsId == tagId && x.ToDoId == toDoToFind.Id))
+            var tag = await this.FindOrAddTagInDB(toDo.TagsInput);
+            if (!toDoToFind.Tags.Any(t => t.Id == tag.Id))
             {
-                _ = await context.TagToDos!.AddAsync(
-                new TagToDo
-                {
-                    TagsId = tagId,
-                    ToDoId = toDoToFind.Id
-                });
+                toDoToFind.Tags.Add(tag);
+
             }
         }
 
-        _ = await context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<IEnumerable<TagModel>> GetTags()
     {
-        var data = await context.Tags
-            .ToListAsync();
+        var data = await context.Tags.ToListAsync();
 
         if (data == null)
         {
@@ -153,18 +155,14 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             return null!;
         }
 
-        var tags = await context.TagToDos
-                .Where(x => x.ToDoId == data.Id)
-                .Join(context.Tags,
-                    tagToDo => tagToDo.TagsId,
-                    tag => tag.Id,
-                    (tagToDo, tag) => tag)
-                .Select(x => new TagModel()
-                {
-                    Id = x.Id,
-                    Name = x.TagName
-                })
-                .ToListAsync();
+        var tagModels = await context.ToDos
+            .Where(todo => todo.Id == id)
+            .SelectMany(todo => todo.Tags)
+            .Select(tag => new TagModel
+            {
+                Id = tag.Id,
+                Name = tag.TagName,
+            }).ToListAsync();
 
         var toDoModel = new ToDoModel()
         {
@@ -174,7 +172,7 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             Deadline = data.Deadline,
             Status = data.Status.ToString(),
             ToDoListId = data.ToDoListId,
-            Tags = tags
+            Tags = tagModels
         };
 
         return toDoModel;
@@ -182,15 +180,11 @@ public class ToDoService(TodoListDbContext context) : IToDoService
 
     public async Task<IEnumerable<ToDoModel>> GetToDosByTag(int tagId)
     {
-        var toDos = await context.TagToDos
-            .Where(x => x.TagsId == tagId)
-            .Join(context.ToDos,
-            tag => tag.ToDoId,
-            toDo => toDo.Id,
-            (tag, toDo) => toDo)
-            .ToListAsync();
+        var tagToDo = context.Tags.Include(tag => tag.ToDos).Where(tag => tag.Id == tagId);
 
-        var toDosModel = toDos.Select(x => new ToDoModel()
+        var toDosModel = await context.ToDos
+        .Where(todo => todo.Tags.Any(tag => tag.Id == tagId))
+        .Select(x => new ToDoModel()
         {
             Id = x.Id,
             Name = x.Name,
@@ -199,8 +193,7 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             Deadline = x.Deadline,
             Status = x.Status.ToString(),
             ToDoListId = x.ToDoListId,
-
-        });
+        }).ToListAsync();
 
         return toDosModel;
     }
@@ -281,7 +274,7 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         => await context.ToDos
         .AnyAsync(c => c.Name == name && c.ToDoListId == listId);
 
-    private async Task<int> FindOrAddTagInDB(string name)
+    private async Task<Tag> FindOrAddTagInDB(string name)
     {
         var tag = await context.Tags
                 .Select(x => x)
@@ -289,10 +282,10 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         if (tag == null)
         {
             tag = new Tag { TagName = name };
-            _ = await context.Tags.AddAsync(tag);
-            _ = await context.SaveChangesAsync();
+            await context.Tags.AddAsync(tag);
+            await context.SaveChangesAsync();
         }
 
-        return tag.Id;
+        return tag;
     }
 }

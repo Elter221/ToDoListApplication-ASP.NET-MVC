@@ -111,9 +111,7 @@ public class ToDoController(IToDoService service) : Controller
             return this.View(model);
         }
 
-        int id = listid;
-
-        return this.RedirectToAction("View", "ToDoList", new { id });
+        return this.RedirectToAction("View", "ToDoList", new { id = listid });
     }
 
     [AcceptVerbs("GET", "POST")]

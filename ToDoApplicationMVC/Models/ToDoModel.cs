@@ -32,7 +32,7 @@ public class ToDoModel
 
     public int UserId { get; set; }
 
-    public ICollection<TagModel>? Tags { get; set; }
+    public List<TagModel>? Tags { get; set; }
 
     //public ICollection<CommentModel>? Comments { get; set; }
 
