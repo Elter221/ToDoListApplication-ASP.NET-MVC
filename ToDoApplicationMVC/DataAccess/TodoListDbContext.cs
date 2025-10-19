@@ -32,10 +32,9 @@ public class TodoListDbContext : DbContext
 
         modelBuilder.Entity<Comment>(entity =>
         {
-            entity.HasKey(comm => new { comm.Id, comm.UserId });
+            entity.HasKey(comm => comm.Id);
             entity.Property(comm => comm.Description).HasMaxLength(100);
             entity.HasOne(comm => comm.ToDo).WithMany(todo => todo.Comments).HasForeignKey(comm => comm.ToDoId);
-            entity.HasOne(todo => todo.User).WithMany(user => user.Comments).HasForeignKey(comm => comm.UserId);
         });
 
         modelBuilder.Entity<Tag>(entity =>

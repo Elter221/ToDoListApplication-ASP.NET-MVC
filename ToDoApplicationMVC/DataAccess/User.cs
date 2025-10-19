@@ -14,6 +14,4 @@ public class User
     public string Password { get; set; }
 
     public List<ToDo> ToDos { get; set; }
-
-    public List<Comment> Comments { get; set; }
 }
