@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ToDoApplicationMVC.Models;
 
-public class ToDoListModel
+public class ToDoListModel : BaseDTO
 {
-    public int Id { get; set; }
-
     [Required]
     [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
     [Remote(action: "Validate", controller: "ToDoList")]

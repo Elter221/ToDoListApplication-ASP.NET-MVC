@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.DataAccess;
+using ToDoApplicationMVC.DataAccess.Entities;
 
 namespace ToDoApplicationMVC.Services;
 

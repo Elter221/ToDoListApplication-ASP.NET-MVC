@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess;
+using ToDoApplicationMVC.DataAccess.Entities;
 using ToDoApplicationMVC.Services;
 using ToDoApplicationMVC.Services.Interfaces;
 
@@ -18,6 +18,9 @@ builder.Services.AddScoped<IToDoListService, ToDoListService>();
 var app = builder.Build();
 
 app.UseStaticFiles();
+
+//документацию глянуть
+app.UseStatusCodePages();
 
 app.MapDefaultControllerRoute();
 

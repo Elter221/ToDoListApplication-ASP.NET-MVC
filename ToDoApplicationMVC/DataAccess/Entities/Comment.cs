@@ -1,9 +1,7 @@
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DataAccess.Entities;
 
-public class Comment
+public class Comment : BaseEntity
 {
-    public int Id { get; set; }
-
     public string Description { get; set; }
 
     public DateTime LastUpdateTime { get; set; }

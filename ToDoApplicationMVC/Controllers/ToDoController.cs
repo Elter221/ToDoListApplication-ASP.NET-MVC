@@ -6,9 +6,9 @@ namespace ToDoApplicationMVC.Controllers;
 public class ToDoController(IToDoService service) : Controller
 {
     [AcceptVerbs("GET", "POST")]
-    public async Task<IActionResult> Index([FromQuery] int userId, [FromForm] string? search = default, [FromForm] string? searchType = default)
+    public async Task<IActionResult> Index([FromQuery] int userId, [FromForm] string? search = default, [FromForm] string? searchType = default, CancellationToken ct = default)
     {
-        var toDosModel = await service.SearchByType(userId, search, searchType);
+        var toDosModel = await service.SearchByType(userId, search, searchType, ct);
 
         this.ViewBag.Search = search;
 
@@ -30,6 +30,7 @@ public class ToDoController(IToDoService service) : Controller
 
         if (toDoModel == null)
         {
+            //статус код страницы
             return this.NotFound();
         }
 

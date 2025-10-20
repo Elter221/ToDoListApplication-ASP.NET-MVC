@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess;
+using ToDoApplicationMVC.DataAccess.Entities;
 using ToDoApplicationMVC.Models;
 using ToDoApplicationMVC.Services.Interfaces;
 
@@ -47,7 +47,6 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
         return true;
     }
 
-    // Баг при добавлении первого тега, кидает NotFound
     public async Task<bool> EditToDoList(ToDoListModel model)
     {
         if (await this.ListNameExists(model.Name))
@@ -64,10 +63,10 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
 
         return true;
     }
-
-    public async Task<IEnumerable<ToDoListModel>> GetToDoLists()
+    // Cancelation Token
+    public async Task<IReadOnlyList<ToDoListModel>> GetToDoLists()
     {
-        var data = await context.ToDoLists.Include(x => x.ToDos).ToListAsync();
+        var data = context.ToDoLists.Include(x => x.ToDos);
 
         var toDosModel = data.Select(x => new ToDoListModel()
         {
@@ -75,9 +74,9 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
             Name = x.Name,
             CreatedAt = x.CreationDate,
             NumberOfTasks = x.ToDos.Count,
-        }).ToArray();
+        });
 
-        return toDosModel;
+        return await toDosModel.ToListAsync();
     }
 
     public async Task<ToDoListModel> GetToDoList(int id)
@@ -124,6 +123,6 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
         return toDosModel;
     }
 
-    public async Task<bool> ListNameExists(string name)
+    private async Task<bool> ListNameExists(string name)
         => await context.ToDoLists.AnyAsync(c => c.Name == name);
 }

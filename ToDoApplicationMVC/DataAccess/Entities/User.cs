@@ -1,12 +1,7 @@
-using System.ComponentModel.DataAnnotations;
+namespace ToDoApplicationMVC.DataAccess.Entities;
 
-namespace ToDoApplicationMVC.DataAccess;
-
-public class User
+public class User : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
-
     public string Name { get; set; }
 
     public string Email { get; set; }

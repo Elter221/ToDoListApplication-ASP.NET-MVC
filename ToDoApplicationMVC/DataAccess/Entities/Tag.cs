@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DataAccess.Entities;
 
-public class Tag
+public class Tag : BaseEntity
 {
-    public int Id { get; set; }
-
     public string TagName { get; set; }
 
     public List<ToDo> ToDos { get; set; }

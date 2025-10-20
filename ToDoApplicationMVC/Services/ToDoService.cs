@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess;
+using ToDoApplicationMVC.DataAccess.Entities;
 using ToDoApplicationMVC.Models;
 using ToDoApplicationMVC.Services.Interfaces;
 
@@ -7,6 +7,7 @@ namespace ToDoApplicationMVC.Services;
 
 public class ToDoService(TodoListDbContext context) : IToDoService
 {
+    //Add ct to all methods
     public async Task CreateNewToDoInList(ToDoModel model, int listId)
     {
         var toDo = new ToDo()
@@ -45,7 +46,7 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         return true;
     }
 
-    public async Task<bool> DeleteTag(int tagId, int toDoId)
+    public async Task<bool> DeleteTagFromToDo(int tagId, int toDoId)
     {
         var tag = await context.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
 
@@ -67,6 +68,7 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         return true;
     }
 
+    //ToDoModel содержит listId
     public async Task<bool> EditToDo(ToDoModel toDo, int listId)
     {
         if (await this.IsToDoNameExists(toDo.Name, listId))
@@ -200,9 +202,10 @@ public class ToDoService(TodoListDbContext context) : IToDoService
 
     public async Task<IEnumerable<ToDoModel>> SearchByType(int userId, string? search, string? searchType)
     {
+        bool isValidDate = DateOnly.TryParseExact(search, "dd.MM.yyyy", out DateOnly date);
+
         var query = context.ToDos
             .Where(param => param.UserId == userId);
-        bool isValidDate = DateOnly.TryParseExact(search, "dd.MM.yyyy", out DateOnly date);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -270,7 +273,7 @@ public class ToDoService(TodoListDbContext context) : IToDoService
         return toDosModel;
     }
 
-    public async Task<bool> IsToDoNameExists(string name, int listId)
+    private async Task<bool> IsToDoNameExists(string name, int listId)
         => await context.ToDos
         .AnyAsync(c => c.Name == name && c.ToDoListId == listId);
 

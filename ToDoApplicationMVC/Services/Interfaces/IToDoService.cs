@@ -24,5 +24,5 @@ public interface IToDoService
 
     Task<IEnumerable<ToDoModel>> GetToDosByTag(int tagId);
 
-    Task<bool> DeleteTag(int tagId, int toDoId);
+    Task<bool> DeleteTagFromToDo(int tagId, int toDoId);
 }

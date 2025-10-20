@@ -4,10 +4,8 @@ using ToDoApplicationMVC.CustomAttributes;
 
 namespace ToDoApplicationMVC.Models;
 
-public class ToDoModel
+public class ToDoModel : BaseDTO
 {
-    public int Id { get; set; }
-
     [Required]
     [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
     [Remote(action: "Validate", controller: "ToDo")]
@@ -34,7 +32,7 @@ public class ToDoModel
 
     public List<TagModel>? Tags { get; set; }
 
-    //public ICollection<CommentModel>? Comments { get; set; }
+    //public List<CommentModel>? Comments { get; set; }
 
     public string TagsInput { get; set; } = string.Empty;
 }

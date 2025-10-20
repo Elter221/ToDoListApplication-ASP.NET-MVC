@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DataAccess.Entities;
 
-public class ToDoList
+public class ToDoList : BaseEntity
 {
-    public int Id { get; set; }
-
     [Required]
     public string Name { get; set; }
 

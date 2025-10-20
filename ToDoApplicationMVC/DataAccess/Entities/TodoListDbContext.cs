@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DataAccess.Entities;
 
 public class TodoListDbContext : DbContext
 {
