@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ToDoApplicationMVC.CustomAttributes;
+namespace ToDoApplicationMVC.BLL.CustomAttributes;
 
 public class FutureDateAttribute : ValidationAttribute
 {

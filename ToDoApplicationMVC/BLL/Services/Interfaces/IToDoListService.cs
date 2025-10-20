@@ -1,6 +1,6 @@
-using ToDoApplicationMVC.Models;
+using ToDoApplicationMVC.BLL.Models;
 
-namespace ToDoApplicationMVC.Services.Interfaces;
+namespace ToDoApplicationMVC.BLL.Services.Interfaces;
 
 public interface IToDoListService
 {

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using ToDoApplicationMVC.Services.Interfaces;
+using ToDoApplicationMVC.BLL.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
 public class TagController(IToDoService service) : Controller

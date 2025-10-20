@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using ToDoApplicationMVC.Models;
-using ToDoApplicationMVC.Services.Interfaces;
+using ToDoApplicationMVC.BLL.Models;
+using ToDoApplicationMVC.BLL.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
 public class ToDoController(IToDoService service) : Controller

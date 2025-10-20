@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using ToDoApplicationMVC.BLL.Models;
+using ToDoApplicationMVC.BLL.Services.Interfaces;
 using ToDoApplicationMVC.DataAccess.Entities;
-using ToDoApplicationMVC.Models;
-using ToDoApplicationMVC.Services.Interfaces;
 
-namespace ToDoApplicationMVC.Services;
+namespace ToDoApplicationMVC.BLL.Services;
 
 public class ToDoListService(TodoListDbContext context) : IToDoListService
 {

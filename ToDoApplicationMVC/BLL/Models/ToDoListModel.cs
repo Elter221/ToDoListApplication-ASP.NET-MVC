@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ToDoApplicationMVC.Models;
+namespace ToDoApplicationMVC.BLL.Models;
 
 public class ToDoListModel : BaseDTO
 {

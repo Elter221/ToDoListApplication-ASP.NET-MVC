@@ -1,4 +1,4 @@
-namespace ToDoApplicationMVC.Models;
+namespace ToDoApplicationMVC.BLL.Models;
 
 public class TagModel : BaseDTO
 {

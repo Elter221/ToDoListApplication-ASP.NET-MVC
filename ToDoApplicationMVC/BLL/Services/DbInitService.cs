@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.DataAccess;
 using ToDoApplicationMVC.DataAccess.Entities;
 
-namespace ToDoApplicationMVC.Services;
+namespace ToDoApplicationMVC.BLL.Services;
 
 public class DbInitService(IServiceProvider serviceProvider) : BackgroundService
 {
