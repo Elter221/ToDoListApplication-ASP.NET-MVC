@@ -17,7 +17,9 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
             NumberOfTasks = 0,
         };
 
-        return (await unitOfWork.ToDoListRepository.Create(toDoList, cancellationToken)) > 0;
+        var result = (await unitOfWork.ToDoListRepository.Create(toDoList, cancellationToken)) > 0;
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return result;
     }
 
     public async Task<bool> DeleteToDoList(int id, CancellationToken cancellationToken = default)
@@ -33,6 +35,8 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
         }
         await unitOfWork.ToDoListRepository.Delete(id);
 
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
         return true;
     }
 
@@ -45,8 +49,9 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
             CreationDate = model.CreatedAt,
             NumberOfTasks = 0,
         };
-
-        return await unitOfWork.ToDoListRepository.Update(dto, cancellationToken);
+        var result = await unitOfWork.ToDoListRepository.Update(dto, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return result;
     }
 
     public async Task<IReadOnlyList<ToDoListModel>> GetToDoLists(CancellationToken cancellationToken = default)
@@ -103,7 +108,4 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
 
         return toDosModel;
     }
-
-    public async Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default)
-        => await unitOfWork.SaveChangesAsync(cancellationToken);
 }

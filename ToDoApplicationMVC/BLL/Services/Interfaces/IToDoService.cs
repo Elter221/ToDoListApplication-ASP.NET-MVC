@@ -23,6 +23,4 @@ public interface IToDoService
     Task<IReadOnlyList<ToDoModel>> GetToDosByTag(int tagId, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteTagFromToDo(int tagId, int toDoId, CancellationToken cancellationToken = default);
-    Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default);
-
 }

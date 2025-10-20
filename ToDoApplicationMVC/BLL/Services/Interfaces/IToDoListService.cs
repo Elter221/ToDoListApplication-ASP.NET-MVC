@@ -14,6 +14,4 @@ public interface IToDoListService
     Task<bool> DeleteToDoList(int id, CancellationToken cancellationToken = default);
 
     Task<bool> EditToDoList(ToDoListModel model, CancellationToken cancellationToken = default);
-
-    Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default);
 }

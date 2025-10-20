@@ -28,6 +28,7 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
         };
 
         await unitOfWork.ToDoRepository.Create(toDo, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
@@ -38,12 +39,18 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
         }
 
         await unitOfWork.ToDoRepository.Delete(id, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;
     }
 
     public async Task<bool> DeleteTagFromToDo(int tagId, int toDoId, CancellationToken cancellationToken = default)
-        => await unitOfWork.TagRepository.DeleteTagFromToDo(tagId, toDoId, cancellationToken);
+    {
+        var result = await unitOfWork.TagRepository.DeleteTagFromToDo(tagId, toDoId, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return result;
+    }
 
     public async Task<bool> EditToDo(ToDoModel toDo, CancellationToken cancellationToken = default)
     {
@@ -67,6 +74,7 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
         var isEdited = await unitOfWork.ToDoRepository.Update(model, cancellationToken);
 
         await unitOfWork.ToDoRepository.AddTagToDo(toDo.Id, toDo.TagsInput, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return isEdited;
     }
@@ -194,7 +202,4 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
 
         return toDosModel;
     }
-
-    public async Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default)
-        => await unitOfWork.SaveChangesAsync(cancellationToken);
 }
