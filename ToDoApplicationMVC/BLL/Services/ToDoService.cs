@@ -1,14 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess.Entities;
-using ToDoApplicationMVC.Models;
-using ToDoApplicationMVC.Services.Interfaces;
+using ToDoApplicationMVC.BLL.Models;
+using ToDoApplicationMVC.BLL.Services.Interfaces;
+using ToDoApplicationMVC.DAL.Entities;
+using ToDoApplicationMVC.DAL.Interfaces;
 
-namespace ToDoApplicationMVC.Services;
+namespace ToDoApplicationMVC.BLL.Services;
 
-public class ToDoService(TodoListDbContext context) : IToDoService
+public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
 {
-    //Add ct to all methods
-    public async Task CreateNewToDoInList(ToDoModel model, int listId)
+    //Pass list id with model
+    public async Task CreateNewToDoInList(ToDoModel model, CancellationToken cancellationToken = default)
     {
         var toDo = new ToDo()
         {
@@ -22,116 +23,78 @@ public class ToDoService(TodoListDbContext context) : IToDoService
                 "Completed" => Status.Completed,
                 _ => Status.Failed,
             },
-            ToDoListId = listId,
-            UserId = (await context.Users.FirstAsync()).Id,
+            ToDoListId = model.ToDoListId,
+            UserId = model.UserId,
         };
 
-        await context.ToDos.AddAsync(toDo);
-        await context.SaveChangesAsync();
+        await unitOfWork.ToDoRepository.Create(toDo, cancellationToken);
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
     {
-        var country = await context.ToDos.FindAsync(id);
-
-        if (country is null)
+        if (await unitOfWork.ToDoRepository.GetById(id, cancellationToken) == null)
         {
             return false;
         }
 
-        context.ToDos.Remove(country!);
-
-        await context.SaveChangesAsync();
+        await unitOfWork.ToDoRepository.Delete(id, cancellationToken);
 
         return true;
     }
 
-    public async Task<bool> DeleteTagFromToDo(int tagId, int toDoId)
+    public async Task<bool> DeleteTagFromToDo(int tagId, int toDoId, CancellationToken cancellationToken = default)
+        => await unitOfWork.TagRepository.DeleteTagFromToDo(tagId, toDoId, cancellationToken);
+
+    public async Task<bool> EditToDo(ToDoModel toDo, CancellationToken cancellationToken = default)
     {
-        var tag = await context.Tags.FirstOrDefaultAsync(t => t.Id == tagId);
-
-        if (tag is null)
+        ToDo model = new ToDo()
         {
-            return false;
-        }
-
-        var toDo = context.ToDos.Include(todo => todo.Tags).SingleOrDefault(t => t.Id == toDoId);
-        if (toDo is null)
-        {
-            return false;
-        }
-
-        toDo.Tags.Remove(tag);
-        await context.SaveChangesAsync();
-
-
-        return true;
-    }
-
-    //ToDoModel содержит listId
-    public async Task<bool> EditToDo(ToDoModel toDo, int listId)
-    {
-        if (await this.IsToDoNameExists(toDo.Name, listId))
-        {
-            return false;
-        }
-
-        var toDoToFind = await context.ToDos
-            .Include(t => t.Tags)
-            .FirstOrDefaultAsync(x => x.Id == toDo.Id);
-        if (toDoToFind == null)
-        {
-            return false;
-        }
-        toDoToFind.Name = toDo.Name;
-        toDoToFind.Description = toDo.Description;
-        toDoToFind.CreationDate = toDo.CreatedAt;
-        toDoToFind.Deadline = toDo.Deadline;
-        toDoToFind.Status = toDo.Status switch
-        {
-            "InProgress" => Status.InProgress,
-            "Completed" => Status.Completed,
-            _ => Status.Failed,
-        };
-        if (toDo.TagsInput != string.Empty)
-        {
-            var tag = await this.FindOrAddTagInDB(toDo.TagsInput);
-            if (!toDoToFind.Tags.Any(t => t.Id == tag.Id))
+            Id = toDo.Id,
+            Name = toDo.Name,
+            Description = toDo.Description,
+            CreationDate = toDo.CreatedAt,
+            Deadline = toDo.Deadline,
+            Status = toDo.Status switch
             {
-                toDoToFind.Tags.Add(tag);
+                "InProgress" => Status.InProgress,
+                "Completed" => Status.Completed,
+                _ => Status.Failed,
+            },
+            ToDoListId = toDo.ToDoListId,
+            UserId = toDo.UserId,
+        };
 
-            }
-        }
+        var isEdited = await unitOfWork.ToDoRepository.Update(model, cancellationToken);
 
-        await context.SaveChangesAsync();
+        await unitOfWork.ToDoRepository.AddTagToDo(toDo.Id, toDo.TagsInput, cancellationToken);
 
-        return true;
+        return isEdited;
     }
 
-    public async Task<IEnumerable<TagModel>> GetTags()
+    public async Task<IReadOnlyList<TagModel>> GetTags(CancellationToken cancellationToken = default)
     {
-        var data = await context.Tags.ToListAsync();
+        var data = unitOfWork.TagRepository.GetAll();
 
         if (data == null)
         {
             return null!;
         }
 
-        var tagModels = data.Select(x => new TagModel
+        var tagModels = await data.Select(x => new TagModel
         {
             Id = x.Id,
             Name = x.TagName,
-        });
+        }).ToArrayAsync(cancellationToken);
 
         return tagModels;
     }
 
-    public async Task<ToDoModel> GetToDoModelById(int id, int listId)
+    public async Task<ToDoModel?> GetToDoModelById(int id, CancellationToken cancellationToken = default)
     {
-        var toDo = await context.ToDos.FindAsync(id);
+        var toDo = await unitOfWork.ToDoRepository.GetById(id, cancellationToken);
         if (toDo is null)
         {
-            return null!;
+            return null;
         }
         var toDoModel = new ToDoModel
         {
@@ -141,30 +104,21 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             CreatedAt = toDo.CreationDate,
             Deadline = toDo.Deadline,
             Status = toDo.Status.ToString(),
-            ToDoListId = listId,
+            ToDoListId = toDo.ToDoListId,
+            UserId = toDo.UserId,
         };
 
         return toDoModel;
     }
 
-    public async Task<ToDoModel> GetToDoWithTags(int id)
+    public async Task<ToDoModel?> GetToDoWithTags(int id, CancellationToken cancellationToken = default)
     {
-        var data = await context.ToDos
-            .FirstOrDefaultAsync(x => x.Id == id);
+        var data = await unitOfWork.ToDoRepository.GetToDoWithTags(id, cancellationToken);
 
         if (data == null)
         {
-            return null!;
+            return null;
         }
-
-        var tagModels = await context.ToDos
-            .Where(todo => todo.Id == id)
-            .SelectMany(todo => todo.Tags)
-            .Select(tag => new TagModel
-            {
-                Id = tag.Id,
-                Name = tag.TagName,
-            }).ToListAsync();
 
         var toDoModel = new ToDoModel()
         {
@@ -174,19 +128,21 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             Deadline = data.Deadline,
             Status = data.Status.ToString(),
             ToDoListId = data.ToDoListId,
-            Tags = tagModels
+            Tags = data.Tags.Select(x => new TagModel
+            {
+                Id = x.Id,
+                Name = x.TagName,
+            }).ToList(),
         };
 
         return toDoModel;
     }
 
-    public async Task<IEnumerable<ToDoModel>> GetToDosByTag(int tagId)
+    public async Task<IReadOnlyList<ToDoModel>> GetToDosByTag(int tagId, CancellationToken cancellationToken = default)
     {
-        var tagToDo = context.Tags.Include(tag => tag.ToDos).Where(tag => tag.Id == tagId);
+        var tagToDo = unitOfWork.ToDoRepository.GetToDosByTag(tagId);
 
-        var toDosModel = await context.ToDos
-        .Where(todo => todo.Tags.Any(tag => tag.Id == tagId))
-        .Select(x => new ToDoModel()
+        var toDosModel = await tagToDo.Select(x => new ToDoModel()
         {
             Id = x.Id,
             Name = x.Name,
@@ -195,30 +151,15 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             Deadline = x.Deadline,
             Status = x.Status.ToString(),
             ToDoListId = x.ToDoListId,
-        }).ToListAsync();
+            UserId = x.UserId,
+        }).ToListAsync(cancellationToken);
 
         return toDosModel;
     }
 
-    public async Task<IEnumerable<ToDoModel>> SearchByType(int userId, string? search, string? searchType)
+    public async Task<IReadOnlyList<ToDoModel>> SearchByType(int userId, string? search, string? searchType, CancellationToken cancellationToken = default)
     {
-        bool isValidDate = DateOnly.TryParseExact(search, "dd.MM.yyyy", out DateOnly date);
-
-        var query = context.ToDos
-            .Where(param => param.UserId == userId);
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            query = searchType switch
-            {
-                "name" => query.Where(c => c.Name.Contains(search)),
-                "status" => query.Where(c => c.Status.ToString() == search),
-                "deadline" => isValidDate ? query.Where(c => c.Deadline <= date) : query.Where(c => false),
-                _ => query,
-            };
-        }
-
-        var data = await query.ToListAsync();
+        var data = await unitOfWork.ToDoRepository.SearchByType(userId, search, searchType).ToListAsync(cancellationToken);
 
         var toDosModel = data.Select(x => new ToDoModel()
         {
@@ -229,35 +170,15 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             Deadline = x.Deadline,
             Status = x.Status.ToString(),
             ToDoListId = x.ToDoListId,
+            UserId = x.UserId,
         }).ToArray();
 
         return toDosModel;
     }
 
-    public async Task<IEnumerable<ToDoModel>> SortByParams(int userId, string? sortBy, string? sortOrder)
+    public async Task<IReadOnlyList<ToDoModel>> SortByParams(int userId, string? sortBy, string? sortOrder, CancellationToken cancellationToken = default)
     {
-        var query = context.ToDos
-            .Where(param => param.UserId == userId);
-
-        query = (sortBy?.ToLower(), sortOrder?.ToLower()) switch
-        {
-
-            ("name", "asc") => query.OrderBy(t => t.Name),
-            ("name", "desc") => query.OrderByDescending(t => t.Name),
-
-            ("status", "asc") => query.OrderBy(t => t.Status),
-            ("status", "desc") => query.OrderByDescending(t => t.Status),
-
-            ("deadline", "asc") => query.OrderBy(t => t.Deadline),
-            ("deadline", "desc") => query.OrderByDescending(t => t.Deadline),
-
-            (_, "asc") => query.OrderBy(t => t.CreationDate),
-            (_, "desc") => query.OrderByDescending(t => t.CreationDate),
-
-            _ => query
-        };
-
-        var data = await query.ToListAsync();
+        var data = await unitOfWork.ToDoRepository.SortByParams(userId, sortBy, sortOrder).ToListAsync(cancellationToken);
 
         var toDosModel = data.Select(x => new ToDoModel()
         {
@@ -268,27 +189,12 @@ public class ToDoService(TodoListDbContext context) : IToDoService
             Deadline = x.Deadline,
             Status = x.Status.ToString(),
             ToDoListId = x.ToDoListId,
+            UserId = x.UserId,
         }).ToArray();
 
         return toDosModel;
     }
 
-    private async Task<bool> IsToDoNameExists(string name, int listId)
-        => await context.ToDos
-        .AnyAsync(c => c.Name == name && c.ToDoListId == listId);
-
-    private async Task<Tag> FindOrAddTagInDB(string name)
-    {
-        var tag = await context.Tags
-                .Select(x => x)
-                .FirstOrDefaultAsync(t => t.TagName == name);
-        if (tag == null)
-        {
-            tag = new Tag { TagName = name };
-            await context.Tags.AddAsync(tag);
-            await context.SaveChangesAsync();
-        }
-
-        return tag;
-    }
+    public async Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default)
+        => await unitOfWork.SaveChangesAsync(cancellationToken);
 }

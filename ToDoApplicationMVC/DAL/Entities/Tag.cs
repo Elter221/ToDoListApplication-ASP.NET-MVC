@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using ToDoApplicationMVC.DAL.Entities;
 
-namespace ToDoApplicationMVC.DataAccess.Entities;
+namespace ToDoApplicationMVC.DAL.Entities;
 
 public class Tag : BaseEntity
 {

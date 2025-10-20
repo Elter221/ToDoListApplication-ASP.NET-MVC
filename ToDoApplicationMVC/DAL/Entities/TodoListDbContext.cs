@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace ToDoApplicationMVC.DataAccess.Entities;
+namespace ToDoApplicationMVC.DAL.Entities;
 
 public class TodoListDbContext : DbContext
 {
@@ -21,6 +21,7 @@ public class TodoListDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<ToDo>(entity =>
         {
             entity.HasKey(todo => todo.Id);
@@ -51,6 +52,5 @@ public class TodoListDbContext : DbContext
         {
             entity.HasKey(user => user.Id);
         });
-        base.OnModelCreating(modelBuilder);
     }
 }

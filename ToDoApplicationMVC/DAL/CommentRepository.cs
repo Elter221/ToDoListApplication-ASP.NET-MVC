@@ -1,32 +1,8 @@
-using ToDoApplicationMVC.DataAccess.Entities;
-using ToDoApplicationMVC.DataAccess.Interfaces;
+using ToDoApplicationMVC.DAL.Entities;
+using ToDoApplicationMVC.DAL.Interfaces;
 
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DAL;
 
-public class CommentRepository(TodoListDbContext context) : ICommentRepository
+public class CommentRepository(TodoListDbContext context) : Repository<Comment>(context), ICommentRepository
 {
-    public Task<int> Create(Comment model, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task Delete(int id, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IQueryable<Comment> GetAll()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Comment?> GetById(int id, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> Update(Comment model, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
 }

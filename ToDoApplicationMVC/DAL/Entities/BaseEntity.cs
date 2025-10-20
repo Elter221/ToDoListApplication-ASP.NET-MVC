@@ -1,4 +1,4 @@
-namespace ToDoApplicationMVC.DataAccess.Entities;
+namespace ToDoApplicationMVC.DAL.Entities;
 
 public class BaseEntity
 {

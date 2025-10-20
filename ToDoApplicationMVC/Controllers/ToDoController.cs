@@ -56,6 +56,8 @@ public class ToDoController(IToDoService service) : Controller
             return this.View(model);
         }
 
+        model.ToDoListId = id;
+
         await service.CreateNewToDoInList(model, id);
 
         return this.RedirectToAction("View", "ToDoList", new { id });

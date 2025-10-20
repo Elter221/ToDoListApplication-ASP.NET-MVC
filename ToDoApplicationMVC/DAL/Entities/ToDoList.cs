@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ToDoApplicationMVC.DataAccess.Entities;
+namespace ToDoApplicationMVC.DAL.Entities;
 
 public class ToDoList : BaseEntity
 {

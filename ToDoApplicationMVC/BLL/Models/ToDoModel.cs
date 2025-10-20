@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
-using ToDoApplicationMVC.CustomAttributes;
+using ToDoApplicationMVC.BLL.CustomAttributes;
 
 namespace ToDoApplicationMVC.BLL.Models;
 

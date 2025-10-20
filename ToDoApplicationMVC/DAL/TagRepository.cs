@@ -1,34 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess.Entities;
-using ToDoApplicationMVC.DataAccess.Interfaces;
+using ToDoApplicationMVC.DAL.Entities;
+using ToDoApplicationMVC.DAL.Interfaces;
 
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DAL;
 
-public class TagRepository(TodoListDbContext context) : ITagRepository
+public class TagRepository(TodoListDbContext context) : Repository<Tag>(context), ITagRepository
 {
-    public async Task<int> Create(Tag model, CancellationToken cancellationToken = default)
+    public new async Task<int> Create(Tag model, CancellationToken cancellationToken = default)
     {
-        if (await context.Tags.AnyAsync(t => t.TagName == model.TagName, cancellationToken))
+        if (await this.DbSet.AnyAsync(t => t.TagName == model.TagName, cancellationToken))
         {
             return -1;
         }
 
-        await context.Tags.AddAsync(model, cancellationToken);
-        return (await context.Tags.LastOrDefaultAsync(cancellationToken))!.Id;
-    }
-
-    public async Task Delete(int id, CancellationToken cancellationToken = default)
-    {
-        var tag = await context.Tags.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        if (tag != null)
-        {
-            context.Tags.Remove(tag);
-        }
+        return await base.Create(model, cancellationToken);
     }
 
     public async Task<bool> DeleteTagFromToDo(int tagId, int toDoId, CancellationToken cancellationToken = default)
     {
-        var tag = await context.Tags
+        var tag = await this.DbSet
             .FirstOrDefaultAsync(t => t.Id == tagId, cancellationToken);
 
         if (tag is null)
@@ -49,26 +39,13 @@ public class TagRepository(TodoListDbContext context) : ITagRepository
         return false;
     }
 
-    public IQueryable<Tag> GetAll() => context.Tags.Select(x => x);
-
-    public async Task<Tag?> GetById(int id, CancellationToken cancellationToken = default)
-        => await context.Tags.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
-    public async Task<bool> Update(Tag model, CancellationToken cancellationToken = default)
+    public new async Task<bool> Update(Tag model, CancellationToken cancellationToken = default)
     {
         if (await context.Tags.AnyAsync(c => c.TagName == model.TagName, cancellationToken))
         {
             return false;
         }
 
-        var tagToFind = await context.Tags.FirstOrDefaultAsync(x => x.Id == model.Id, cancellationToken);
-
-        if (tagToFind != null)
-        {
-            tagToFind.TagName = model.TagName;
-            return true;
-        }
-
-        return false;
+        return await base.Update(model, cancellationToken);
     }
 }

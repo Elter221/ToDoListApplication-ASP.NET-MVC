@@ -1,18 +1,16 @@
-using ToDoApplicationMVC.DataAccess.Entities;
-
-namespace ToDoApplicationMVC.DataAccess.Interfaces;
+namespace ToDoApplicationMVC.DAL.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
-    IRepository<ToDoList> ToDoListRepository { get; }
+    IToDoListRepository ToDoListRepository { get; }
 
-    IRepository<ToDo> ToDoRepository { get; }
+    IToDoRepository ToDoRepository { get; }
 
-    IRepository<Tag> TagRepository { get; }
+    ITagRepository TagRepository { get; }
 
-    IRepository<User> UserRepository { get; }
+    IUserRepository UserRepository { get; }
 
-    IRepository<Comment> CommentRepository { get; }
+    ICommentRepository CommentRepository { get; }
 
     int SaveChanges();
 

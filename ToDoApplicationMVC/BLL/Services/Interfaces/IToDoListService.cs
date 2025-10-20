@@ -4,15 +4,16 @@ namespace ToDoApplicationMVC.BLL.Services.Interfaces;
 
 public interface IToDoListService
 {
-    Task<IEnumerable<ToDoListModel>> GetToDoLists();
-    Task<IEnumerable<ToDoModel>> GetToDosOfList(int listId);
-    Task<bool> ListNameExists(string name);
+    Task<IReadOnlyList<ToDoListModel>> GetToDoLists(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ToDoModel>> GetToDosOfList(int listId, CancellationToken cancellationToken = default);
 
-    Task<bool> AddNewToDoList(ToDoListModel model);
+    Task<bool> CreateToDoList(ToDoListModel model, CancellationToken cancellationToken = default);
 
-    Task<ToDoListModel> GetToDoList(int id);
+    Task<ToDoListModel> GetToDoList(int id, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteToDoList(int id);
+    Task<bool> DeleteToDoList(int id, CancellationToken cancellationToken = default);
 
-    Task<bool> EditToDoList(ToDoListModel model);
+    Task<bool> EditToDoList(ToDoListModel model, CancellationToken cancellationToken = default);
+
+    Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default);
 }

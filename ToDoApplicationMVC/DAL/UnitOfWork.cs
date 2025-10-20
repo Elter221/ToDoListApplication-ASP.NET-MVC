@@ -1,7 +1,7 @@
-using ToDoApplicationMVC.DataAccess.Entities;
-using ToDoApplicationMVC.DataAccess.Interfaces;
+using ToDoApplicationMVC.DAL.Entities;
+using ToDoApplicationMVC.DAL.Interfaces;
 
-namespace ToDoApplicationMVC.DataAccess;
+namespace ToDoApplicationMVC.DAL;
 
 public class UnitOfWork(TodoListDbContext context) : IUnitOfWork
 {

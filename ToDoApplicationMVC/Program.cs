@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.BLL.Services;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
-using ToDoApplicationMVC.DataAccess.Entities;
+using ToDoApplicationMVC.DAL;
+using ToDoApplicationMVC.DAL.Entities;
+using ToDoApplicationMVC.DAL.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddDbContextPool<TodoListDbContext>(opt => opt.UseSqlServer(bui
 builder.Services.AddHostedService<DbInitService>();
 
 builder.Services.AddScoped<IToDoService, ToDoService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IToDoListService, ToDoListService>();
 

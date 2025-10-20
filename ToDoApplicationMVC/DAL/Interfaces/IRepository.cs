@@ -1,6 +1,6 @@
-using ToDoApplicationMVC.DataAccess.Entities;
+using ToDoApplicationMVC.DAL.Entities;
 
-namespace ToDoApplicationMVC.DataAccess.Interfaces;
+namespace ToDoApplicationMVC.DAL.Interfaces;
 
 public interface IRepository<T>
     where T : BaseEntity

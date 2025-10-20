@@ -1,7 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
-using ToDoApplicationMVC.DataAccess;
-using ToDoApplicationMVC.DataAccess.Entities;
+using ToDoApplicationMVC.DAL;
+using ToDoApplicationMVC.DAL.Entities;
 
 namespace ToDoApplicationMVC.BLL.Services;
 

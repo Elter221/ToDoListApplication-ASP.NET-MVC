@@ -1,19 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.BLL.Models;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
-using ToDoApplicationMVC.DataAccess.Entities;
+using ToDoApplicationMVC.DAL.Entities;
+using ToDoApplicationMVC.DAL.Interfaces;
 
 namespace ToDoApplicationMVC.BLL.Services;
 
-public class ToDoListService(TodoListDbContext context) : IToDoListService
+public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
 {
-    public async Task<bool> AddNewToDoList(ToDoListModel model)
+    public async Task<bool> CreateToDoList(ToDoListModel model, CancellationToken cancellationToken = default)
     {
-        if (await this.ListNameExists(model.Name))
-        {
-            return false;
-        }
-
         var toDoList = new ToDoList()
         {
             Name = model.Name,
@@ -21,67 +17,54 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
             NumberOfTasks = 0,
         };
 
-        _ = context.ToDoLists.Add(toDoList);
-        _ = await context.SaveChangesAsync();
-
-        return true;
+        return (await unitOfWork.ToDoListRepository.Create(toDoList, cancellationToken)) > 0;
     }
 
-    public async Task<bool> DeleteToDoList(int id)
+    public async Task<bool> DeleteToDoList(int id, CancellationToken cancellationToken = default)
     {
-        var todoList = await context.ToDoLists
-        .Include(t => t.ToDos)
-        .SingleOrDefaultAsync(t => t.Id == id);
-
-        if (todoList == null)
+        if (await unitOfWork.ToDoListRepository.GetById(id, cancellationToken) == null)
         {
             return false;
         }
 
-        context.ToDos.RemoveRange(todoList.ToDos);
-
-        _ = context.ToDoLists.Remove(todoList);
-
-        _ = await context.SaveChangesAsync();
-
-        return true;
-    }
-
-    public async Task<bool> EditToDoList(ToDoListModel model)
-    {
-        if (await this.ListNameExists(model.Name))
+        foreach (var item in await unitOfWork.ToDoListRepository.GetToDosOfList(id).ToListAsync(cancellationToken))
         {
-            return false;
+            await unitOfWork.ToDoRepository.Delete(item.Id, cancellationToken);
         }
-
-        var listToFind = await context.ToDoLists.FirstAsync(x => x.Id == model.Id);
-
-        listToFind.Name = model.Name;
-        listToFind.CreationDate = model.CreatedAt;
-
-        _ = await context.SaveChangesAsync();
+        await unitOfWork.ToDoListRepository.Delete(id);
 
         return true;
     }
-    // Cancelation Token
-    public async Task<IReadOnlyList<ToDoListModel>> GetToDoLists()
+
+    public async Task<bool> EditToDoList(ToDoListModel model, CancellationToken cancellationToken = default)
     {
-        var data = context.ToDoLists.Include(x => x.ToDos);
-
-        var toDosModel = data.Select(x => new ToDoListModel()
+        ToDoList dto = new ToDoList
         {
-            Id = x.Id,
-            Name = x.Name,
-            CreatedAt = x.CreationDate,
-            NumberOfTasks = x.ToDos.Count,
-        });
+            Id = model.Id,
+            Name = model.Name,
+            CreationDate = model.CreatedAt,
+            NumberOfTasks = 0,
+        };
 
-        return await toDosModel.ToListAsync();
+        return await unitOfWork.ToDoListRepository.Update(dto, cancellationToken);
     }
 
-    public async Task<ToDoListModel> GetToDoList(int id)
+    public async Task<IReadOnlyList<ToDoListModel>> GetToDoLists(CancellationToken cancellationToken = default)
     {
-        var toDoList = await context.ToDoLists.FindAsync(id);
+        var models = await unitOfWork.ToDoListRepository.GetAll()
+            .Select(x => new ToDoListModel
+            {
+                Id = x.Id,
+                Name = x.Name,
+                CreatedAt = x.CreationDate,
+                NumberOfTasks = x.NumberOfTasks,
+            }).ToArrayAsync(cancellationToken);
+        return models;
+    }
+
+    public async Task<ToDoListModel> GetToDoList(int id, CancellationToken cancellationToken = default)
+    {
+        var toDoList = await unitOfWork.ToDoListRepository.GetById(id, cancellationToken);
         if (toDoList == null)
         {
             return null!;
@@ -98,18 +81,16 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
         return toDoModel;
     }
 
-    public async Task<IEnumerable<ToDoModel>> GetToDosOfList(int listId)
+    public async Task<IReadOnlyList<ToDoModel>> GetToDosOfList(int listId, CancellationToken cancellationToken = default)
     {
-        var data = await context.ToDoLists
-            .Include(x => x.ToDos)
-            .SingleOrDefaultAsync(x => x.Id == listId);
+        var data = unitOfWork.ToDoListRepository.GetToDosOfList(listId);
 
         if (data == null)
         {
             return null!;
         }
 
-        var toDosModel = data.ToDos.Select(x => new ToDoModel()
+        var toDosModel = await data.Select(x => new ToDoModel()
         {
             Id = x.Id,
             Name = x.Name,
@@ -118,11 +99,11 @@ public class ToDoListService(TodoListDbContext context) : IToDoListService
             Deadline = x.Deadline,
             Status = x.Status.ToString(),
             ToDoListId = listId,
-        }).ToArray();
+        }).ToArrayAsync(cancellationToken);
 
         return toDosModel;
     }
 
-    private async Task<bool> ListNameExists(string name)
-        => await context.ToDoLists.AnyAsync(c => c.Name == name);
+    public async Task<int> SaveChangesAsycn(CancellationToken cancellationToken = default)
+        => await unitOfWork.SaveChangesAsync(cancellationToken);
 }
