@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using ToDoApplicationMVC.BLL.Services;
+using ToDoApplicationMVC.BLL.Services.Interfaces;
 using ToDoApplicationMVC.DataAccess.Entities;
-using ToDoApplicationMVC.Services;
-using ToDoApplicationMVC.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
