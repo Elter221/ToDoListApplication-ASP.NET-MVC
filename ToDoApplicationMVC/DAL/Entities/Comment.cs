@@ -8,7 +8,5 @@ public class Comment : BaseEntity
 
     public int ToDoId { get; set; }
 
-    public int UserId { get; set; }
-
     public ToDo ToDo { get; set; }
 }

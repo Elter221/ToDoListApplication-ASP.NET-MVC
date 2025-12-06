@@ -1,4 +1,4 @@
-.using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.BLL.Services;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
 using ToDoApplicationMVC.DAL;
