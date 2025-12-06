@@ -8,8 +8,6 @@ public interface IUnitOfWork : IDisposable
 
     ITagRepository TagRepository { get; }
 
-    IUserRepository UserRepository { get; }
-
     ICommentRepository CommentRepository { get; }
 
     int SaveChanges();

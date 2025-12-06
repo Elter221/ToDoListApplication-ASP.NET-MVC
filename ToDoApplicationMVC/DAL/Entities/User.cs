@@ -1,12 +1,8 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace ToDoApplicationMVC.DAL.Entities;
 
-public class User : BaseEntity
+public class User : IdentityUser<int>
 {
-    public string Name { get; set; }
-
-    public string Email { get; set; }
-
-    public string Password { get; set; }
-
     public List<ToDo> ToDos { get; set; }
 }

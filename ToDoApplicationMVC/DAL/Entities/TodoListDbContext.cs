@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ToDoApplicationMVC.DAL.Entities;
 
-public class TodoListDbContext : DbContext
+public class TodoListDbContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
     public DbSet<ToDo> ToDos { get; set; }
 
@@ -19,10 +21,10 @@ public class TodoListDbContext : DbContext
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<ToDo>(entity =>
+        base.OnModelCreating(builder);
+        builder.Entity<ToDo>(entity =>
         {
             entity.HasKey(todo => todo.Id);
             entity.Property(todo => todo.Description).HasMaxLength(50);
@@ -31,24 +33,24 @@ public class TodoListDbContext : DbContext
             entity.HasOne(todo => todo.ToDoList).WithMany(todoList => todoList.ToDos).HasForeignKey(todo => todo.ToDoListId);
         });
 
-        modelBuilder.Entity<Comment>(entity =>
+        builder.Entity<Comment>(entity =>
         {
             entity.HasKey(comm => comm.Id);
             entity.Property(comm => comm.Description).HasMaxLength(100);
             entity.HasOne(comm => comm.ToDo).WithMany(todo => todo.Comments).HasForeignKey(comm => comm.ToDoId);
         });
 
-        modelBuilder.Entity<Tag>(entity =>
+        builder.Entity<Tag>(entity =>
         {
             entity.HasKey(tag => tag.Id);
         });
 
-        modelBuilder.Entity<ToDoList>(entity =>
+        builder.Entity<ToDoList>(entity =>
         {
             entity.HasKey(list => list.Id);
         });
 
-        modelBuilder.Entity<User>(entity =>
+        builder.Entity<User>(entity =>
         {
             entity.HasKey(user => user.Id);
         });

@@ -7,7 +7,6 @@ public class UnitOfWork(
     TodoListDbContext context,
     IToDoListRepository toDoListRepository,
     IToDoRepository toDoRepository,
-    IUserRepository userRepository,
     ITagRepository tagRepository,
     ICommentRepository commentRepository) : IUnitOfWork
 {
@@ -16,8 +15,6 @@ public class UnitOfWork(
     public IToDoRepository ToDoRepository => toDoRepository;
 
     public ITagRepository TagRepository => tagRepository;
-
-    public IUserRepository UserRepository => userRepository;
 
     public ICommentRepository CommentRepository => commentRepository;
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using ToDoApplicationMVC.DAL.Entities;
 using ToDoApplicationMVC.DAL.Interfaces;
