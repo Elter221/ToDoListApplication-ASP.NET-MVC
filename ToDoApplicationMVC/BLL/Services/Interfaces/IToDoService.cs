@@ -6,7 +6,7 @@ public interface IToDoService
 {
     Task<ToDoModel?> GetToDoWithTags(int id, CancellationToken cancellationToken = default);
 
-    Task CreateNewToDoInList(ToDoModel model, CancellationToken cancellationToken = default);
+    Task<bool> CreateNewToDoInList(ToDoModel model, CancellationToken cancellationToken = default);
 
     Task<ToDoModel?> GetToDoModelById(int id, CancellationToken cancellationToken = default);
 
@@ -19,6 +19,8 @@ public interface IToDoService
     Task<IReadOnlyList<ToDoModel>> SearchByType(int userId, string? search, string? searchType, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<TagModel>> GetTags(CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ToDoModel>> GetToDos(CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ToDoModel>> GetToDosByTag(int tagId, CancellationToken cancellationToken = default);
 

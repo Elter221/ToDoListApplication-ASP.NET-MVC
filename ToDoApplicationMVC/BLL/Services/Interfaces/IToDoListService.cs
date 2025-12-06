@@ -9,7 +9,7 @@ public interface IToDoListService
 
     Task<bool> CreateToDoList(ToDoListModel model, CancellationToken cancellationToken = default);
 
-    Task<ToDoListModel> GetToDoList(int id, CancellationToken cancellationToken = default);
+    Task<ToDoListModel?> GetToDoList(int id, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteToDoList(int id, CancellationToken cancellationToken = default);
 

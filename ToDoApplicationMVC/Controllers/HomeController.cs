@@ -5,6 +5,6 @@ namespace ToDoApplicationMVC.Controllers;
 public class HomeController(IToDoListService service)
     : Controller
 {
-    public async Task<IActionResult> Index()
-        => this.View(await service.GetToDoLists());
+    public async Task<IActionResult> Index(CancellationToken cancellationToken = default)
+        => this.View(await service.GetToDoLists(cancellationToken));
 }

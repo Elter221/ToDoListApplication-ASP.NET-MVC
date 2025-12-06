@@ -10,8 +10,8 @@ public class Repository<TEntity>(TodoListDbContext context) : IRepository<TEntit
     protected DbSet<TEntity> DbSet { get; } = context.Set<TEntity>();
     public async Task<int> Create(TEntity model, CancellationToken cancellationToken = default)
     {
-        await this.DbSet.AddAsync(model, cancellationToken);
-        return (await this.DbSet.LastOrDefaultAsync(cancellationToken))!.Id;
+        var result = await this.DbSet.AddAsync(model, cancellationToken);
+        return (await this.DbSet.OrderByDescending(x => x.Id).FirstOrDefaultAsync(cancellationToken))!.Id;
     }
 
     public async Task Delete(int id, CancellationToken cancellationToken = default)
@@ -23,7 +23,7 @@ public class Repository<TEntity>(TodoListDbContext context) : IRepository<TEntit
         }
     }
 
-    public IQueryable<TEntity> GetAll() => this.DbSet.Select(x => x);
+    public IQueryable<TEntity> GetAll() => this.DbSet;
 
     public async Task<TEntity?> GetById(int id, CancellationToken cancellationToken = default)
         => await this.DbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
@@ -35,6 +35,7 @@ public class Repository<TEntity>(TodoListDbContext context) : IRepository<TEntit
         if (data != null)
         {
             data = model;
+            this.DbSet.Update(data);
             return true;
         }
 

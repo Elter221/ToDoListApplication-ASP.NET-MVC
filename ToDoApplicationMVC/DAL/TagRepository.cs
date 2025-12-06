@@ -26,12 +26,12 @@ public class TagRepository(TodoListDbContext context) : Repository<Tag>(context)
             return false;
         }
 
-        var toDo = context.ToDos
+        var toDo = await context.ToDos
             .Include(todo => todo.Tags)
             .SingleOrDefaultAsync(t => t.Id == toDoId, cancellationToken);
-        if (toDo.Result != null)
+        if (toDo != null)
         {
-            toDo.Result.Tags.Remove(tag);
+            toDo.Tags.Remove(tag);
             return true;
         }
 

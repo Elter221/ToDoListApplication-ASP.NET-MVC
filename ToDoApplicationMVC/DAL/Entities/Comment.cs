@@ -1,5 +1,3 @@
-using ToDoApplicationMVC.DAL.Entities;
-
 namespace ToDoApplicationMVC.DAL.Entities;
 
 public class Comment : BaseEntity

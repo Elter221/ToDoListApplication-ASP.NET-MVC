@@ -32,7 +32,7 @@ public class ToDoModel : BaseDTO
 
     public List<TagModel>? Tags { get; set; }
 
-    //public List<CommentModel>? Comments { get; set; }
+    public List<CommentModel>? Comments { get; set; }
 
     public string TagsInput { get; set; } = string.Empty;
 }

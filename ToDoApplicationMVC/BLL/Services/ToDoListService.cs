@@ -14,7 +14,7 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
         {
             Name = model.Name,
             CreationDate = model.CreatedAt,
-            NumberOfTasks = 0,
+            NumberOfTasks = model.NumberOfTasks,
         };
 
         var result = (await unitOfWork.ToDoListRepository.Create(toDoList, cancellationToken)) > 0;
@@ -47,7 +47,7 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
             Id = model.Id,
             Name = model.Name,
             CreationDate = model.CreatedAt,
-            NumberOfTasks = 0,
+            NumberOfTasks = model.NumberOfTasks,
         };
         var result = await unitOfWork.ToDoListRepository.Update(dto, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -62,17 +62,17 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
                 Id = x.Id,
                 Name = x.Name,
                 CreatedAt = x.CreationDate,
-                NumberOfTasks = x.NumberOfTasks,
+                NumberOfTasks = x.ToDos.Count,
             }).ToArrayAsync(cancellationToken);
         return models;
     }
 
-    public async Task<ToDoListModel> GetToDoList(int id, CancellationToken cancellationToken = default)
+    public async Task<ToDoListModel?> GetToDoList(int id, CancellationToken cancellationToken = default)
     {
         var toDoList = await unitOfWork.ToDoListRepository.GetById(id, cancellationToken);
         if (toDoList == null)
         {
-            return null!;
+            return null;
         }
 
         var toDoModel = new ToDoListModel
@@ -80,7 +80,7 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
             Id = toDoList.Id,
             Name = toDoList.Name,
             CreatedAt = toDoList.CreationDate,
-            NumberOfTasks = toDoList.NumberOfTasks,
+            NumberOfTasks = toDoList.ToDos.Count,
         };
 
         return toDoModel;
@@ -90,9 +90,9 @@ public class ToDoListService(IUnitOfWork unitOfWork) : IToDoListService
     {
         var data = unitOfWork.ToDoListRepository.GetToDosOfList(listId);
 
-        if (data == null)
+        if (!await data.AnyAsync(cancellationToken))
         {
-            return null!;
+            return [];
         }
 
         var toDosModel = await data.Select(x => new ToDoModel()

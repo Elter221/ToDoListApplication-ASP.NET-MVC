@@ -6,9 +6,9 @@ namespace ToDoApplicationMVC.Controllers;
 public class ToDoListController(IToDoListService service) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> View([FromRoute] int id)
+    public async Task<IActionResult> View([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var data = await service.GetToDosOfList(id);
+        var data = await service.GetToDosOfList(id, cancellationToken);
 
         if (data == null)
         {
@@ -26,15 +26,16 @@ public class ToDoListController(IToDoListService service) : Controller
         return this.View();
     }
 
+
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] ToDoListModel model)
+    public async Task<IActionResult> Create([FromForm] ToDoListModel model, CancellationToken cancellationToken = default)
     {
         if (!this.ModelState.IsValid)
         {
             return this.View(model);
         }
 
-        if (!await service.AddNewToDoList(model))
+        if (!await service.CreateToDoList(model, cancellationToken))
         {
             this.ModelState.AddModelError(nameof(model.Name), "List name should be completly new");
             return this.View(model);
@@ -44,9 +45,9 @@ public class ToDoListController(IToDoListService service) : Controller
     }
 
 
-    public async Task<IActionResult> Delete([FromRoute] int id)
+    public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var toDoList = await service.GetToDoList(id);
+        var toDoList = await service.GetToDoList(id, cancellationToken);
         if (toDoList is null)
         {
             return this.NotFound();
@@ -56,9 +57,9 @@ public class ToDoListController(IToDoListService service) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> ConfirmDelete([FromForm] int id)
+    public async Task<IActionResult> ConfirmDelete([FromForm] int id, CancellationToken cancellationToken = default)
     {
-        if (!await service.DeleteToDoList(id))
+        if (!await service.DeleteToDoList(id, cancellationToken))
         {
             return this.NotFound();
         }
@@ -67,9 +68,9 @@ public class ToDoListController(IToDoListService service) : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit([FromRoute] int id)
+    public async Task<IActionResult> Edit([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var toDoList = await service.GetToDoList(id);
+        var toDoList = await service.GetToDoList(id, cancellationToken);
         if (toDoList is null)
         {
             return this.NotFound();
@@ -79,14 +80,14 @@ public class ToDoListController(IToDoListService service) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit([FromForm] ToDoListModel model)
+    public async Task<IActionResult> Edit([FromForm] ToDoListModel model, CancellationToken cancellationToken = default)
     {
         if (!this.ModelState.IsValid)
         {
             return this.View(model);
         }
 
-        if (!await service.EditToDoList(model))
+        if (!await service.EditToDoList(model, cancellationToken))
         {
             this.ModelState.AddModelError(nameof(model.Name), "List name should be completly new");
             return this.View(model);
@@ -96,9 +97,9 @@ public class ToDoListController(IToDoListService service) : Controller
     }
 
     [AcceptVerbs("GET", "POST")]
-    public async Task<ActionResult> Validate(string name)
+    public async Task<ActionResult> Validate(string name, CancellationToken cancellationToken = default)
     {
-        if (await service.ListNameExists(name))
+        if ((await service.GetToDoLists(cancellationToken)).Any(x => x.Name == name))
         {
             return this.Json("List name already exists");
         }

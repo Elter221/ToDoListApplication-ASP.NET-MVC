@@ -9,7 +9,7 @@ namespace ToDoApplicationMVC.BLL.Services;
 public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
 {
     //Pass list id with model
-    public async Task CreateNewToDoInList(ToDoModel model, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateNewToDoInList(ToDoModel model, CancellationToken cancellationToken = default)
     {
         var toDo = new ToDo()
         {
@@ -27,8 +27,13 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
             UserId = model.UserId,
         };
 
-        await unitOfWork.ToDoRepository.Create(toDo, cancellationToken);
+        if (await unitOfWork.ToDoRepository.Create(toDo, cancellationToken) < 0)
+        {
+            return false;
+        }
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
@@ -95,6 +100,30 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
         }).ToArrayAsync(cancellationToken);
 
         return tagModels;
+    }
+
+    public async Task<IReadOnlyList<ToDoModel>> GetToDos(CancellationToken cancellationToken = default)
+    {
+        var data = unitOfWork.ToDoRepository.GetAll();
+
+        if (data == null)
+        {
+            return null!;
+        }
+
+        var toDoModels = await data.Select(x => new ToDoModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            CreatedAt = x.CreationDate,
+            Deadline = x.Deadline,
+            Status = x.Status.ToString(),
+            ToDoListId = x.ToDoListId,
+            UserId = x.UserId,
+        }).ToArrayAsync(cancellationToken);
+
+        return toDoModels;
     }
 
     public async Task<ToDoModel?> GetToDoModelById(int id, CancellationToken cancellationToken = default)

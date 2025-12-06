@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApplicationMVC.BLL.Models;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
@@ -6,9 +7,13 @@ namespace ToDoApplicationMVC.Controllers;
 public class ToDoController(IToDoService service) : Controller
 {
     [AcceptVerbs("GET", "POST")]
-    public async Task<IActionResult> Index([FromQuery] int userId, [FromForm] string? search = default, [FromForm] string? searchType = default, CancellationToken ct = default)
+    public async Task<IActionResult> Index(
+        [FromQuery] int userId,
+        [FromForm] string? search = default,
+        [FromForm] string? searchType = default,
+        CancellationToken cancellationToken = default)
     {
-        var toDosModel = await service.SearchByType(userId, search, searchType, ct);
+        var toDosModel = await service.SearchByType(userId, search, searchType, cancellationToken);
 
         this.ViewBag.Search = search;
 
@@ -17,16 +22,19 @@ public class ToDoController(IToDoService service) : Controller
 
     [AcceptVerbs("GET", "POST")]
     public async Task<IActionResult> Sort
-        ([FromQuery] int userId, [FromForm] string? sortBy = default, [FromForm] string? sortOrder = default)
+        ([FromQuery] int userId,
+        [FromForm] string? sortBy = default,
+        [FromForm] string? sortOrder = default,
+        CancellationToken cancellationToken = default)
     {
-        var toDosModel = await service.SortByParams(userId, sortBy, sortOrder);
+        var toDosModel = await service.SortByParams(userId, sortBy, sortOrder, cancellationToken);
 
         return this.View("Index", toDosModel);
     }
 
-    public async Task<IActionResult> View([FromRoute] int id)
+    public async Task<IActionResult> View([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var toDoModel = await service.GetToDoWithTags(id);
+        var toDoModel = await service.GetToDoWithTags(id, cancellationToken);
 
         if (toDoModel == null)
         {
@@ -43,29 +51,27 @@ public class ToDoController(IToDoService service) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] ToDoModel model, [FromRoute] int id)
+    public async Task<IActionResult> Create([FromForm] ToDoModel model, [FromRoute] int id, CancellationToken cancellationToken = default)
     {
         if (!this.ModelState.IsValid)
         {
             return this.View(model);
         }
+        model.ToDoListId = id;
+        model.UserId = 1;
 
-        if (!await service.IsToDoNameExists(model.Name, id))
+        if (!await service.CreateNewToDoInList(model, cancellationToken))
         {
             this.ModelState.AddModelError(nameof(model.Name), "ToDo name should be completly new");
             return this.View(model);
         }
 
-        model.ToDoListId = id;
-
-        await service.CreateNewToDoInList(model, id);
-
         return this.RedirectToAction("View", "ToDoList", new { id });
     }
 
-    public async Task<IActionResult> Delete([FromRoute] int id, [FromQuery] int listid)
+    public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var toDoModel = await service.GetToDoModelById(id, listid);
+        var toDoModel = await service.GetToDoModelById(id, cancellationToken);
         if (toDoModel is null)
         {
             return this.NotFound();
@@ -76,39 +82,39 @@ public class ToDoController(IToDoService service) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> ConfirmDelete([FromForm] int id, [FromForm] int listid)
+    public async Task<IActionResult> ConfirmDelete([FromForm] int id, [FromForm] int listid, CancellationToken cancellationToken = default)
     {
-        if (!await service.Delete(id))
+        if (!await service.Delete(id, cancellationToken))
         {
             return this.NotFound();
         }
 
-        id = listid;
-
-        return this.RedirectToAction("View", "ToDoList", new { id });
+        return this.RedirectToAction("View", "ToDoList", new { id = listid });
     }
 
-    public async Task<IActionResult> Edit([FromRoute] int id, [FromQuery] int listid)
+    public async Task<IActionResult> Edit([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var toDoModel = await service.GetToDoModelById(id, listid);
+        var toDoModel = await service.GetToDoModelById(id, cancellationToken);
         if (toDoModel is null)
         {
             return this.NotFound();
         }
 
-
         return this.View(toDoModel);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit([FromForm] ToDoModel model, [FromForm] int listid)
+    public async Task<IActionResult> Edit(
+        [FromForm] ToDoModel model,
+        [FromForm] int listid,
+        CancellationToken cancellationToken = default)
     {
         if (!this.ModelState.IsValid)
         {
             return this.View(model);
         }
 
-        if (!await service.EditToDo(model, listid))
+        if (!await service.EditToDo(model, cancellationToken))
         {
             this.ModelState.AddModelError(nameof(model.Name), "ToDo name should be completly new");
             return this.View(model);
@@ -118,9 +124,10 @@ public class ToDoController(IToDoService service) : Controller
     }
 
     [AcceptVerbs("GET", "POST")]
-    public async Task<ActionResult> Validate(string name, int listid)
+    public async Task<ActionResult> Validate(string name, int listid, CancellationToken cancellationToken = default)
     {
-        if (await service.IsToDoNameExists(name, listid))
+        if ((await service.GetToDos(cancellationToken))
+            .Any(x => x.Name == name && x.ToDoListId == listid))
         {
             return this.Json("ToDo name already exists");
         }

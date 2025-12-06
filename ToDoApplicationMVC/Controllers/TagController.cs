@@ -4,9 +4,9 @@ using ToDoApplicationMVC.BLL.Services.Interfaces;
 namespace ToDoApplicationMVC.Controllers;
 public class TagController(IToDoService service) : Controller
 {
-    public async Task<IActionResult> View()
+    public async Task<IActionResult> View(CancellationToken cancellationToken = default)
     {
-        var result = await service.GetTags();
+        var result = await service.GetTags(cancellationToken);
         if (result == null)
         {
             return this.NotFound();
@@ -15,9 +15,9 @@ public class TagController(IToDoService service) : Controller
         return this.View(result);
     }
 
-    public async Task<IActionResult> OnTagClick(int tagId, string tagName)
+    public async Task<IActionResult> OnTagClick(int tagId, string tagName, CancellationToken cancellationToken = default)
     {
-        var toDosModel = await service.GetToDosByTag(tagId);
+        var toDosModel = await service.GetToDosByTag(tagId, cancellationToken);
 
         this.ViewBag.Tag = tagName;
 
@@ -25,9 +25,9 @@ public class TagController(IToDoService service) : Controller
     }
 
     [AcceptVerbs("POST")]
-    public async Task<IActionResult> DeleteTag(int tagId, int id)
+    public async Task<IActionResult> DeleteTag(int tagId, int id, CancellationToken cancellationToken = default)
     {
-        if (!await service.DeleteTag(tagId, id))
+        if (!await service.DeleteTagFromToDo(tagId, id, cancellationToken))
         {
             return this.NotFound();
         }

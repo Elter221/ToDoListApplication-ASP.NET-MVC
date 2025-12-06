@@ -13,16 +13,13 @@ public class ToDoListRepository(TodoListDbContext context) : Repository<ToDoList
             return -1;
         }
 
-        //var toDoList = new ToDoList()
-        //{
-        //    Name = model.Name,
-        //    CreationDate = model.CreatedAt,
-        //    NumberOfTasks = 0,
-        //};
         return await base.Create(model, cancellationToken);
     }
 
     public IQueryable<ToDo> GetToDosOfList(int listId) => this.DbSet.Where(x => x.Id == listId).SelectMany(x => x.ToDos).AsQueryable();
+
+    public new async Task<ToDoList?> GetById(int id, CancellationToken cancellationToken = default)
+        => await this.DbSet.Include(x => x.ToDos).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
     public new async Task<bool> Update(ToDoList model, CancellationToken cancellationToken = default)
     {
