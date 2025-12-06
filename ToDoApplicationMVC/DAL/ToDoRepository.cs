@@ -50,10 +50,15 @@ public class ToDoRepository(TodoListDbContext context) : Repository<ToDo>(contex
         .Where(todo => todo.Tags.Any(tag => tag.Id == tagId))
         .Select(x => x);
 
-    public async Task<ToDo?> GetToDoWithTags(int id, CancellationToken cancellationToken = default) =>
-        await this.DbSet
+    public async Task<ToDo?> GetToDoWithTagsAndComments(int id, CancellationToken cancellationToken = default)
+    {
+        var result = await this.DbSet
             .Include(t => t.Tags)
+            .Include(t => t.Comments)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken) ?? null;
+
+        return result;
+    }
 
     public IQueryable<ToDo> SearchByType(int userId, string? search, string? searchType)
     {

@@ -1,6 +1,10 @@
 @using ToDoApplicationMVC.BLL.Models
 @model ToDoModel
 
+@{
+    var toDoId = ViewContext.RouteData.Values["id"]?.ToString();
+}
+
 
 <table class="table">
     <thead>
@@ -16,3 +20,175 @@
         @await Html.PartialAsync("_ToDoRow", Model)
     </tbody>
 </table>
+
+
+<div class="comments-section mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Comments</h4>
+        <span class="badge bg-secondary">@(Model.Comments?.Count ?? 0) comments</span>
+    </div>
+
+    <!-- Add Comment Form -->
+    <div class="card mb-4 border-primary">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Add New Comment</h5>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Comment" asp-action="AddComment" asp-route-id="@toDoId" method="post">
+                <div class="mb-3">
+                    <textarea name="newComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Write your comment here..."
+                              style="min-height: 100px;"
+                              required></textarea>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary px-4">Post Comment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comments List -->
+    <div class="comments-list">
+        @if (Model.Comments != null && Model.Comments.Any())
+        {
+            @foreach (var comment in Model.Comments.OrderByDescending(c => c.LastUpdateTime))
+            {
+                <!-- Comment Display (Always visible) -->
+                <div class="card mb-4 comment-display shadow-sm"
+                     id="comment-display-@comment.CommentId"
+                     style="border-left: 5px solid #0d6efd;">
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-10">
+                                <!-- Comment Text -->
+                                <div class="comment-text mb-3">
+                                    <p class="mb-0" style="font-size: 1.1rem; line-height: 1.6;">
+                                        @comment.Description
+                                    </p>
+                                </div>
+
+                                <!-- Timestamp -->
+                                <div class="comment-meta">
+                                    <small class="text-muted">
+                                        Last modified:
+                                        <span class="fw-semibold">
+                                            @comment.LastUpdateTime.ToString("dd.MM.yyyy HH:mm")
+                                        </span>
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="col-2 text-end">
+                                <div class="d-flex flex-column gap-2">
+                                    <!-- Edit button - triggers inline editing -->
+                                    <button type="button"
+                                            class="btn btn-outline-primary edit-btn"
+                                            onclick="showEditForm(@comment.CommentId)"
+                                            style="width: 100px;">
+                                        Edit
+                                    </button>
+                                    <form asp-controller="Comment" asp-action="DeleteComment"
+                                          asp-route-id="@toDoId"
+                                          asp-route-commentId="@comment.CommentId"
+                                          method="post"
+                                          class="d-inline-block">
+                                        <button type="submit"
+                                                class="btn btn-outline-danger"
+                                                style="width: 100px;"
+                                                onclick="return confirm('Are you sure you want to delete this comment?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Form (Hidden by default) -->
+                <div class="card mb-4 border-warning edit-form"
+                     id="edit-form-@comment.CommentId"
+                     style="display: none;">
+                    <div class="card-header bg-warning bg-opacity-10">
+                        <h5 class="mb-0">Edit Comment</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-controller="Comment" asp-action="EditComment"
+                              asp-route-id="@toDoId"
+                              asp-route-commentId="@comment.CommentId"
+                              method="post">
+                            <div class="mb-3">
+                                <textarea name="newText"
+                                  class="form-control"
+                                  rows="4"
+                                  style="min-height: 100px;">@comment.Description</textarea>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted">
+                                        Last modified: @comment.LastUpdateTime.ToString("dd.MM.yyyy HH:mm")
+                                    </small>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-success px-4">Save</button>
+                                    <button type="button"
+                                            class="btn btn-outline-secondary"
+                                            onclick="cancelEdit(@comment.CommentId)">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="card border-dashed text-center py-5">
+                <div class="card-body">
+                    <h5 class="text-muted">No comments yet</h5>
+                    <p class="text-muted mb-0">Be the first to add a comment!</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function showEditForm(commentId) {
+        const displayDiv = document.getElementById('comment-display-' + commentId);
+        if (displayDiv) {
+            displayDiv.style.display = 'none';
+        }
+
+        const editForm = document.getElementById('edit-form-' + commentId);
+        if (editForm) {
+            editForm.style.display = 'block';
+        }
+    }
+
+    function cancelEdit(commentId) {
+        const displayDiv = document.getElementById('comment-display-' + commentId);
+        if (displayDiv) {
+            displayDiv.style.display = 'block';
+        }
+
+        const editForm = document.getElementById('edit-form-' + commentId);
+        if (editForm) {
+            editForm.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Comments page loaded - functions available');
+
+        console.log('showEditForm function:', typeof showEditForm);
+        console.log('cancelEdit function:', typeof cancelEdit);
+    });
+</script>

@@ -34,11 +34,10 @@ public class ToDoController(IToDoService service) : Controller
 
     public async Task<IActionResult> View([FromRoute] int id, CancellationToken cancellationToken = default)
     {
-        var toDoModel = await service.GetToDoWithTags(id, cancellationToken);
+        var toDoModel = await service.GetToDoWithTagsAndComments(id, cancellationToken);
 
         if (toDoModel == null)
         {
-            //статус код страницы
             return this.NotFound();
         }
 

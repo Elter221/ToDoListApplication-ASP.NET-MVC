@@ -5,7 +5,7 @@ namespace ToDoApplicationMVC.DAL.Interfaces;
 public interface IToDoRepository : IRepository<ToDo>
 {
     Task AddTagToDo(int toDoId, string tagName, CancellationToken cancellationToken = default);
-    Task<ToDo?> GetToDoWithTags(int id, CancellationToken cancellationToken = default);
+    Task<ToDo?> GetToDoWithTagsAndComments(int id, CancellationToken cancellationToken = default);
     IQueryable<ToDo> GetToDosByTag(int tagId);
     IQueryable<ToDo> SearchByType(int userId, string? search, string? searchType);
 

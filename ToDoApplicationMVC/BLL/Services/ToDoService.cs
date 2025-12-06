@@ -148,10 +148,9 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
         return toDoModel;
     }
 
-    public async Task<ToDoModel?> GetToDoWithTags(int id, CancellationToken cancellationToken = default)
+    public async Task<ToDoModel?> GetToDoWithTagsAndComments(int id, CancellationToken cancellationToken = default)
     {
-        var data = await unitOfWork.ToDoRepository.GetToDoWithTags(id, cancellationToken);
-
+        var data = await unitOfWork.ToDoRepository.GetToDoWithTagsAndComments(id, cancellationToken);
         if (data == null)
         {
             return null;
@@ -170,6 +169,12 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
                 Id = x.Id,
                 Name = x.TagName,
             }).ToList(),
+            Comments = data.Comments.Select(x => new CommentModel
+            {
+                CommentId = x.Id,
+                LastUpdateTime = x.LastUpdateTime,
+                Description = x.Description,
+            }).ToList()
         };
 
         return toDoModel;
@@ -230,5 +235,41 @@ public class ToDoService(IUnitOfWork unitOfWork) : IToDoService
         }).ToArray();
 
         return toDosModel;
+    }
+
+    public async Task<bool> DeleteCommentFromToDo(int commentId, int toDoId, CancellationToken cancellationToken = default)
+    {
+        var result = await unitOfWork.CommentRepository.DeleteCommentFromToDo(commentId, toDoId, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return result;
+    }
+
+    public async Task<bool> AddToDoComment(string newComment, int toDoId, CancellationToken cancellationToken = default)
+    {
+        var comment = new Comment
+        {
+            Id = unitOfWork.CommentRepository.NextId,
+            Description = newComment,
+            ToDoId = toDoId,
+            LastUpdateTime = DateTime.UtcNow,
+        };
+
+        var id = await unitOfWork.CommentRepository.Create(comment, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return id >= 0;
+
+    }
+
+    public async Task<bool> EditCommentInToDo(int commentId, string newText, CancellationToken cancellationToken = default)
+    {
+        var result = await unitOfWork.CommentRepository.Update(commentId, newText, cancellationToken);
+        if ((await unitOfWork.SaveChangesAsync(cancellationToken)) > 0 && result)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

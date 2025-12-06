@@ -39,17 +39,17 @@ public class CommentRepository(TodoListDbContext context) : Repository<Comment>(
         return false;
     }
 
-    public new async Task<bool> Update(Comment model, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(int commentId, string newText, CancellationToken cancellationToken = default)
     {
-        var data = await this.DbSet.FirstOrDefaultAsync(c => c.Id == model.Id, cancellationToken);
+        var data = await this.DbSet.FirstOrDefaultAsync(c => c.Id == commentId, cancellationToken);
         if (data is null)
         {
             return false;
         }
 
-        data.Description = model.Description;
+        data.Description = newText;
         data.LastUpdateTime = DateTime.UtcNow;
 
-        return await base.Update(model, cancellationToken);
+        return true;
     }
 }

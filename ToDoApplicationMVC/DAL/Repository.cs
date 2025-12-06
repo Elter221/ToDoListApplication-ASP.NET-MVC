@@ -7,11 +7,13 @@ namespace ToDoApplicationMVC.DAL;
 public class Repository<TEntity>(TodoListDbContext context) : IRepository<TEntity>
     where TEntity : BaseEntity
 {
+    public int NextId { get; set; } = 0;
     protected DbSet<TEntity> DbSet { get; } = context.Set<TEntity>();
     public async Task<int> Create(TEntity model, CancellationToken cancellationToken = default)
     {
         var result = await this.DbSet.AddAsync(model, cancellationToken);
-        return (await this.DbSet.OrderByDescending(x => x.Id).FirstOrDefaultAsync(cancellationToken))!.Id;
+        this.NextId = result.Entity.Id + 1;
+        return result.Entity.Id;
     }
 
     public async Task Delete(int id, CancellationToken cancellationToken = default)
@@ -35,7 +37,6 @@ public class Repository<TEntity>(TodoListDbContext context) : IRepository<TEntit
         if (data != null)
         {
             data = model;
-            this.DbSet.Update(data);
             return true;
         }
 

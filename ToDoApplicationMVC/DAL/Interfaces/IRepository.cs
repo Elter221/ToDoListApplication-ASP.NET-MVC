@@ -5,6 +5,7 @@ namespace ToDoApplicationMVC.DAL.Interfaces;
 public interface IRepository<T>
     where T : BaseEntity
 {
+    public int NextId { get; set; }
     IQueryable<T> GetAll();
     Task<T?> GetById(int id, CancellationToken cancellationToken = default);
     Task<int> Create(T model, CancellationToken cancellationToken = default);

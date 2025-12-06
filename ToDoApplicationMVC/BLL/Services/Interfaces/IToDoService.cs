@@ -4,7 +4,7 @@ namespace ToDoApplicationMVC.BLL.Services.Interfaces;
 
 public interface IToDoService
 {
-    Task<ToDoModel?> GetToDoWithTags(int id, CancellationToken cancellationToken = default);
+    Task<ToDoModel?> GetToDoWithTagsAndComments(int id, CancellationToken cancellationToken = default);
 
     Task<bool> CreateNewToDoInList(ToDoModel model, CancellationToken cancellationToken = default);
 
@@ -25,4 +25,10 @@ public interface IToDoService
     Task<IReadOnlyList<ToDoModel>> GetToDosByTag(int tagId, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteTagFromToDo(int tagId, int toDoId, CancellationToken cancellationToken = default);
+
+    Task<bool> DeleteCommentFromToDo(int commentId, int toDoId, CancellationToken cancellationToken = default);
+
+    Task<bool> AddToDoComment(string newComment, int toDoId, CancellationToken cancellationToken = default);
+
+    Task<bool> EditCommentInToDo(int commentId, string newText, CancellationToken cancellationToken = default);
 }
