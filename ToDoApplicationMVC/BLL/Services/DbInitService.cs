@@ -14,16 +14,6 @@ public class DbInitService(IServiceProvider serviceProvider) : BackgroundService
 
         _ = await dbContext.Database.EnsureCreatedAsync(stoppingToken);
 
-        if (!await dbContext.Users.AnyAsync(stoppingToken))
-        {
-            _ = dbContext.Users.Add(new User
-            {
-                Name = "Admin",
-                Email = "admin@gmail.com",
-                Password = "12345",
-            });
-        }
-
         _ = await dbContext.SaveChangesAsync(stoppingToken);
 
         if (!await dbContext.ToDoLists.AnyAsync(stoppingToken))
@@ -46,6 +36,12 @@ public class DbInitService(IServiceProvider serviceProvider) : BackgroundService
 
         if (!await dbContext.ToDos.AnyAsync(stoppingToken))
         {
+
+            var toDoListId = (await dbContext.ToDoLists.FirstAsync()).Id;
+            var userId = await dbContext.Users
+                                            .Where(x => x.Email == "elter@gmail.com")
+                                            .Select(x => x.Id)
+                                            .FirstOrDefaultAsync();
             dbContext.ToDos.AddRange([
                     new ToDo
                     {
@@ -54,8 +50,8 @@ public class DbInitService(IServiceProvider serviceProvider) : BackgroundService
                         CreationDate = new DateOnly(2025, 5, 13),
                         Deadline = new DateOnly(2025, 5, 14),
                         Status = Status.InProgress,
-                        ToDoListId = (await dbContext.ToDoLists.FirstAsync()).Id,
-                        UserId = (await dbContext.ToDoLists.FirstAsync()).Id
+                        ToDoListId = toDoListId,
+                        UserId = userId,
                     },
                     new ToDo
                     {
@@ -64,8 +60,8 @@ public class DbInitService(IServiceProvider serviceProvider) : BackgroundService
                         CreationDate = new DateOnly(2025, 3, 13),
                         Deadline = new DateOnly(2025, 5, 14),
                         Status = Status.Completed,
-                        ToDoListId = (await dbContext.ToDoLists.FirstAsync()).Id,
-                        UserId = (await dbContext.ToDoLists.FirstAsync()).Id
+                        ToDoListId = toDoListId,
+                        UserId = userId,
                     },
                     new ToDo
                     {
@@ -74,8 +70,8 @@ public class DbInitService(IServiceProvider serviceProvider) : BackgroundService
                         CreationDate = new DateOnly(2025, 4, 13),
                         Deadline = new DateOnly(2025, 5, 13),
                         Status = Status.Failed,
-                        ToDoListId = (await dbContext.ToDoLists.FirstAsync()).Id,
-                        UserId = (await dbContext.ToDoLists.FirstAsync()).Id
+                        ToDoListId = toDoListId,
+                        UserId = userId,
                     }
                 ]);
         }
