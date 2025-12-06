@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
+
+[Authorize]
 public class CommentController(IToDoService service) : Controller
 {
-
+    [Authorize(Roles = "Owner, Editor")]
     [AcceptVerbs("POST")]
     public async Task<IActionResult> AddComment(string newComment, int id, CancellationToken cancellationToken = default)
     {
@@ -16,6 +19,7 @@ public class CommentController(IToDoService service) : Controller
         return this.RedirectToAction("View", "ToDo", new { id });
     }
 
+    [Authorize(Roles = "Owner, Editor")]
     [AcceptVerbs("POST")]
     public async Task<IActionResult> DeleteComment(int commentId, int id, CancellationToken cancellationToken = default)
     {
@@ -27,6 +31,7 @@ public class CommentController(IToDoService service) : Controller
         return this.RedirectToAction("View", "ToDo", new { id });
     }
 
+    [Authorize(Roles = "Owner, Editor")]
     [AcceptVerbs("POST")]
     public async Task<IActionResult> EditComment(int commentId, string newText, int id, CancellationToken cancellationToken = default)
     {

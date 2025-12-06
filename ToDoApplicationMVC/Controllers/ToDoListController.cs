@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApplicationMVC.BLL.Models;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
+
+[Authorize]
 public class ToDoListController(IToDoListService service) : Controller
 {
     [HttpGet]

@@ -11,7 +11,10 @@
         <input type="hidden" name="id" value="@id" />
         <div class="tag-with-delete">
             <span class="tag-text">@Model.Name</span>
-            <button type="submit" class="delete-tag-btn">×</button>
+            @if (User.IsInRole("Admin") || User.IsInRole("Owner") || User.IsInRole("Editor"))
+                {
+                <button type="submit" class="delete-tag-btn">×</button>
+                }
         </div>
     </form>
 }

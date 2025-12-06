@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApplicationMVC.BLL.Services.Interfaces;
 
 namespace ToDoApplicationMVC.Controllers;
+
+[Authorize]
 public class TagController(IToDoService service) : Controller
 {
     public async Task<IActionResult> View(CancellationToken cancellationToken = default)
@@ -24,6 +27,7 @@ public class TagController(IToDoService service) : Controller
         return this.View("~/Views/ToDo/Index.cshtml", toDosModel);
     }
 
+    [Authorize(Roles = "Owner, Editor")]
     [AcceptVerbs("POST")]
     public async Task<IActionResult> DeleteTag(int tagId, int id, CancellationToken cancellationToken = default)
     {
