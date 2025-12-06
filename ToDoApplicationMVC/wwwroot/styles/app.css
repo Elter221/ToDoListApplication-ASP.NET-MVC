@@ -65,6 +65,7 @@ table, th, td {
     color: red;
 }
 
+/*Tag*/
 .tag-button {
     padding: 6px 12px;
     background-color: #e9ecef;
@@ -123,6 +124,7 @@ table, th, td {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
+/*Comment*/
 .comments-section {
     background-color: #f8f9fa;
     border-radius: 10px;
@@ -194,7 +196,7 @@ table, th, td {
     animation: fadeIn 0.3s ease;
 }
 
-@@keyframes fadeIn {
+@keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -205,4 +207,77 @@ table, th, td {
         transform: translateY(0);
     }
 }
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-control {
+    padding: 0.75rem;
+}
+
+.btn-primary {
+    padding: 0.75rem;
+}
+
+/*Menu*/
+menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    margin: 0;
+}
+
+    /* Left menu items */
+    menu > a {
+        text-decoration: none;
+        color: #333;
+    }
+
+    /* Right side menu */
+    menu > ul {
+        display: flex;
+        gap: 15px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+    }
+
+        menu > ul li {
+            display: inline;
+        }
+
+            /* Auth buttons styling */
+            menu > ul li a,
+            menu > ul li button {
+                padding: 8px 15px;
+                text-decoration: none;
+                color: #495057;
+                background: none;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                font-size: 14px;
+                cursor: pointer;
+            }
+
+                menu > ul li a:hover,
+                menu > ul li button:hover {
+                    background-color: #e9ecef;
+                    border-color: #adb5bd;
+                }
+
+            /* User greeting */
+            menu > ul li span {
+                margin-right: 10px;
+                font-weight: 500;
+            }
 
