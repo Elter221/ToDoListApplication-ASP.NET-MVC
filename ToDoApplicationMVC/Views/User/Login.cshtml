@@ -1,0 +1,48 @@
+@section PageHeader {
+}
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <h2 class="text-center mb-4">Login</h2>
+
+            <form asp-controller="User" asp-action="Login" method="post">
+                <div class="mb-3">
+                    <input type="email"
+                           class="form-control"
+                           name="email"
+                           placeholder="Email"
+                           required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="password"
+                           class="form-control"
+                           name="password"
+                           placeholder="Password"
+                           required>
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <p class="mb-1">@error.ErrorMessage</p>
+                        }
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+
+                <div class="text-center mt-3">
+                    <a asp-controller="User" asp-action="Register">Create new account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
